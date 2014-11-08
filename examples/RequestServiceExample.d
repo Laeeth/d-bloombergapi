@@ -17,26 +17,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "BlpThreadUtil.h"
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
-#include <blpapi_element.h>
-#include <blpapi_event.h>
-#include <blpapi_eventdispatcher.h>
-#include <blpapi_eventformatter.h>
-#include <blpapi_message.h>
-#include <blpapi_name.h>
-#include <blpapi_providersession.h>
-#include <blpapi_session.h>
-#include <blpapi_topiclist.h>
-#include <blpapi_topic.h>
-#include <blpapi_identity.h>
-
-#include <ctime>
-#include <sys/timeb.h>
-#include <iostream>
-#include <iterator>
-#include <map>
-#include <string>
 
 using namespace BloombergLP;
 using namespace blpapi;
@@ -338,216 +324,214 @@ public:
     {
     }
 
-    bool authorize(const Service &authService,
-                   Identity *providerIdentity,
-                   AbstractSession *session,
-                   const CorrelationId &cid)
+bool authorize(const Service &authService,
+               Identity *providerIdentity,
+               AbstractSession *session,
+               const CorrelationId &cid)
+{
     {
-        {
-            MutexGuard guard(&g_mutex);
-            g_authorizationStatus[cid] = WAITING;
-        }
-        EventQueue tokenEventQueue;
-        session->generateToken(CorrelationId(), &tokenEventQueue);
-        std::string token;
-        Event event = tokenEventQueue.nextEvent();
-        if (event.eventType() == Event::TOKEN_STATUS) {
-            MessageIterator iter(event);
-            while (iter.next()) {
-                Message msg = iter.message();
-                msg.print(std::cout);
-                if (msg.messageType() == TOKEN_SUCCESS) {
-                    token = msg.getElementAsString(TOKEN);
-                }
-                else if (msg.messageType() == TOKEN_FAILURE) {
-                    break;
-                }
-            }
-        }
-        if (token.length() == 0) {
-            std::cout << "Failed to get token" << std::endl;
-            return false;
-        }
-
-        Request authRequest = authService.createAuthorizationRequest();
-        authRequest.set(TOKEN, token.c_str());
-
-        session->sendAuthorizationRequest(
-            authRequest,
-            providerIdentity,
-            cid);
-
-        time_t startTime = time(0);
-        const int WAIT_TIME_SECONDS = 10;
-        while (true) {
-            {
-                MutexGuard guard(&g_mutex);
-                if (WAITING != g_authorizationStatus[cid]) {
-                    return AUTHORIZED == g_authorizationStatus[cid];
-                }
-            }
-            time_t endTime = time(0);
-            if (endTime - startTime > WAIT_TIME_SECONDS) {
-                return false;
-            }
-            SLEEP(1);
-        }
+        MutexGuard guard(&g_mutex);
+        g_authorizationStatus[cid] = WAITING;
     }
-
-
-    void serverRun(ProviderSession *providerSession)
-    {
-        ProviderSession& session = *providerSession;
-        std::cout << "Server is starting------" << std::endl;
-        if (!session.start()) {
-            std::cerr << "Failed to start server session." << std::endl;
-            return;
-        }
-
-        Identity providerIdentity = session.createIdentity();
-        if (!d_authOptions.empty()) {
-            bool isAuthorized = false;
-            const char* authServiceName = "//blp/apiauth";
-            if (session.openService(authServiceName)) {
-                Service authService = session.getService(authServiceName);
-                isAuthorized = authorize(authService, &providerIdentity,
-                        &session, CorrelationId((void *)"sauth"));
+    EventQueue tokenEventQueue;
+    session->generateToken(CorrelationId(), &tokenEventQueue);
+    std::string token;
+    Event event = tokenEventQueue.nextEvent();
+    if (event.eventType() == Event::TOKEN_STATUS) {
+        MessageIterator iter(event);
+        while (iter.next()) {
+            Message msg = iter.message();
+            msg.print(std::cout);
+            if (msg.messageType() == TOKEN_SUCCESS) {
+                token = msg.getElementAsString(TOKEN);
             }
-            if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
-                return;
-            }
-        }
-
-        if (!session.registerService(d_service.c_str(), providerIdentity)) {
-            std::cerr <<"Failed to register " << d_service << std::endl;
-            return;
-        }
-    }
-
-    void clientRun(Session *requesterSession)
-    {
-        Session& session = *requesterSession;
-        std::cout << "Client is starting------" << std::endl;
-        if (!session.start()) {
-            std::cerr <<"Failed to start client session." << std::endl;
-            return;
-        }
-
-        Identity identity = session.createIdentity();
-        if (!d_authOptions.empty()) {
-            bool isAuthorized = false;
-            const char* authServiceName = "//blp/apiauth";
-            if (session.openService(authServiceName)) {
-                Service authService = session.getService(authServiceName);
-                isAuthorized = authorize(authService, &identity,
-                        &session, CorrelationId((void *)"cauth"));
-            }
-            if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
-                return;
-            }
-        }
-
-        if (!session.openService(d_service.c_str())) {
-            std::cerr <<"Failed to open " << d_service << std::endl;
-            return;
-        }
-
-        Service service = session.getService(d_service.c_str());
-        Request request = service.createRequest("ReferenceDataRequest");
-
-        // append securities to request
-        // Add securities to request
-        Element securities = request.getElement("securities");
-        for (size_t i = 0; i < d_securities.size(); ++i) {
-            securities.appendValue(d_securities[i].c_str());
-        }
-
-        // Add fields to request
-        Element fields = request.getElement("fields");
-        for (size_t i = 0; i < d_fields.size(); ++i) {
-            fields.appendValue(d_fields[i].c_str());
-        }
-
-        request.set("timestamp", getTimestamp());
-
-        {
-            MutexGuard guard(&g_mutex);
-            std::cout << "Sending Request: " << request << std::endl;
-        }
-        EventQueue eventQueue;
-        session.sendRequest(request, identity,
-                CorrelationId((void *)"AddRequest"), &eventQueue);
-
-        while (true) {
-            Event event = eventQueue.nextEvent();
-            std::cout << std::endl << "Client received an event" << std::endl;
-            MessageIterator msgIter(event);
-            while (msgIter.next()) {
-                Message msg = msgIter.message();
-                MutexGuard guard(&g_mutex);
-                if (event.eventType() == Event::RESPONSE) {
-                    if (msg.hasElement("timestamp")) {
-                        double responseTime = msg.getElementAsFloat64(
-                                                "timestamp");
-                        std::cout << "Response latency = "
-                                  << getTimestamp() - responseTime
-                                  << std::endl;
-                    }
-                }
-                msg.print(std::cout) << std::endl;
-            }
-            if (event.eventType() == Event::RESPONSE) {
+            else if (msg.messageType() == TOKEN_FAILURE) {
                 break;
             }
         }
     }
+    if (token.length() == 0) {
+        std::cout << "Failed to get token" << std::endl;
+        return false;
+    }
 
-    void run(int argc, char **argv)
-    {
-        if (!parseCommandLine(argc, argv))
+    Request authRequest = authService.createAuthorizationRequest();
+    authRequest.set(TOKEN, token.c_str());
+
+    session->sendAuthorizationRequest(
+        authRequest,
+        providerIdentity,
+        cid);
+
+    time_t startTime = time(0);
+    const int WAIT_TIME_SECONDS = 10;
+    while (true) {
+        {
+            MutexGuard guard(&g_mutex);
+            if (WAITING != g_authorizationStatus[cid]) {
+                return AUTHORIZED == g_authorizationStatus[cid];
+            }
+        }
+        time_t endTime = time(0);
+        if (endTime - startTime > WAIT_TIME_SECONDS) {
+            return false;
+        }
+        SLEEP(1);
+    }
+}
+
+
+void serverRun(ProviderSession *providerSession)
+{
+    ProviderSession& session = *providerSession;
+    std::cout << "Server is starting------" << std::endl;
+    if (!session.start()) {
+        std::cerr << "Failed to start server session." << std::endl;
+        return;
+    }
+
+    Identity providerIdentity = session.createIdentity();
+    if (!d_authOptions.empty()) {
+        bool isAuthorized = false;
+        const char* authServiceName = "//blp/apiauth";
+        if (session.openService(authServiceName)) {
+            Service authService = session.getService(authServiceName);
+            isAuthorized = authorize(authService, &providerIdentity,
+                    &session, CorrelationId((void *)"sauth"));
+        }
+        if (!isAuthorized) {
+            std::cerr << "No authorization" << std::endl;
             return;
-
-        SessionOptions sessionOptions;
-        for (size_t i = 0; i < d_hosts.size(); ++i) {
-            sessionOptions.setServerAddress(d_hosts[i].c_str(), d_port, i);
-        }
-        sessionOptions.setAuthenticationOptions(d_authOptions.c_str());
-        sessionOptions.setAutoRestartOnDisconnection(true);
-        sessionOptions.setNumStartAttempts(d_hosts.size());
-
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
-        std::copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << std::endl;
-
-        MyProviderEventHandler providerEventHandler(d_service);
-        ProviderSession providerSession(
-                sessionOptions, &providerEventHandler, 0);
-
-        MyRequesterEventHandler requesterEventHandler;
-        Session requesterSession(sessionOptions, &requesterEventHandler, 0);
-
-        if (d_role == SERVER || d_role == BOTH) {
-            serverRun(&providerSession);
-        }
-        if (d_role == CLIENT || d_role == BOTH) {
-            clientRun(&requesterSession);
-        }
-
-        // wait for enter key to exit application
-        std::cout << "Press ENTER to quit" << std::endl;
-        char dummy[2];
-        std::cin.getline(dummy, 2);
-        if (d_role == SERVER || d_role == BOTH) {
-            providerSession.stop();
-        }
-        if (d_role == CLIENT || d_role == BOTH) {
-            requesterSession.stop();
         }
     }
-};
+
+    if (!session.registerService(d_service.c_str(), providerIdentity)) {
+        std::cerr <<"Failed to register " << d_service << std::endl;
+        return;
+    }
+}
+
+void clientRun(Session *requesterSession)
+{
+    Session& session = *requesterSession;
+    std::cout << "Client is starting------" << std::endl;
+    if (!session.start()) {
+        std::cerr <<"Failed to start client session." << std::endl;
+        return;
+    }
+
+    Identity identity = session.createIdentity();
+    if (!d_authOptions.empty()) {
+        bool isAuthorized = false;
+        const char* authServiceName = "//blp/apiauth";
+        if (session.openService(authServiceName)) {
+            Service authService = session.getService(authServiceName);
+            isAuthorized = authorize(authService, &identity,
+                    &session, CorrelationId((void *)"cauth"));
+        }
+        if (!isAuthorized) {
+            std::cerr << "No authorization" << std::endl;
+            return;
+        }
+    }
+
+    if (!session.openService(d_service.c_str())) {
+        std::cerr <<"Failed to open " << d_service << std::endl;
+        return;
+    }
+
+    Service service = session.getService(d_service.c_str());
+    Request request = service.createRequest("ReferenceDataRequest");
+
+    // append securities to request
+    // Add securities to request
+    Element securities = request.getElement("securities");
+    for (size_t i = 0; i < d_securities.size(); ++i) {
+        securities.appendValue(d_securities[i].c_str());
+    }
+
+    // Add fields to request
+    Element fields = request.getElement("fields");
+    for (size_t i = 0; i < d_fields.size(); ++i) {
+        fields.appendValue(d_fields[i].c_str());
+    }
+
+    request.set("timestamp", getTimestamp());
+
+    {
+        MutexGuard guard(&g_mutex);
+        std::cout << "Sending Request: " << request << std::endl;
+    }
+    EventQueue eventQueue;
+    session.sendRequest(request, identity,
+            CorrelationId((void *)"AddRequest"), &eventQueue);
+
+    while (true) {
+        Event event = eventQueue.nextEvent();
+        std::cout << std::endl << "Client received an event" << std::endl;
+        MessageIterator msgIter(event);
+        while (msgIter.next()) {
+            Message msg = msgIter.message();
+            MutexGuard guard(&g_mutex);
+            if (event.eventType() == Event::RESPONSE) {
+                if (msg.hasElement("timestamp")) {
+                    double responseTime = msg.getElementAsFloat64(
+                                            "timestamp");
+                    std::cout << "Response latency = "
+                              << getTimestamp() - responseTime
+                              << std::endl;
+                }
+            }
+            msg.print(std::cout) << std::endl;
+        }
+        if (event.eventType() == Event::RESPONSE) {
+            break;
+        }
+    }
+}
+
+void run(string[]argv)
+{
+    if (!parseCommandLine(argc, argv))
+        return;
+
+    SessionOptions sessionOptions;
+    foreach(i; 0.. d_hosts.size())
+    {
+        sessionOptions.setServerAddress(d_hosts[i].c_str(), d_port, i);
+    }
+    sessionOptions.setAuthenticationOptions(d_authOptions.c_str());
+    sessionOptions.setAutoRestartOnDisconnection(true);
+    sessionOptions.setNumStartAttempts(d_hosts.size());
+
+    writefln("Connecting to port %s on %s" << d_port, copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
+    std::cout << std::endl;
+
+    MyProviderEventHandler providerEventHandler(d_service);
+    ProviderSession providerSession(
+            sessionOptions, &providerEventHandler, 0);
+
+    MyRequesterEventHandler requesterEventHandler;
+    Session requesterSession(sessionOptions, &requesterEventHandler, 0);
+
+    if (d_role == SERVER || d_role == BOTH) {
+        serverRun(&providerSession);
+    }
+    if (d_role == CLIENT || d_role == BOTH) {
+        clientRun(&requesterSession);
+    }
+
+    // wait for enter key to exit application
+    std::cout << "Press ENTER to quit" << std::endl;
+    char dummy[2];
+    std::cin.getline(dummy, 2);
+    if (d_role == SERVER || d_role == BOTH) {
+        providerSession.stop();
+    }
+    if (d_role == CLIENT || d_role == BOTH) {
+        requesterSession.stop();
+    }
+}
 
 int main(int argc, char **argv)
 {

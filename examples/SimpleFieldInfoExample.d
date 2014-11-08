@@ -17,26 +17,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_session.h>
-#include <blpapi_eventdispatcher.h>
-
-#include <blpapi_event.h>
-#include <blpapi_message.h>
-#include <blpapi_element.h>
-#include <blpapi_name.h>
-#include <blpapi_request.h>
-#include <blpapi_subscriptionlist.h>
-#include <blpapi_defs.h>
-#include <blpapi_exception.h>
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace BloombergLP;
-using namespace blpapi;
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
 namespace {
     const Name FIELD_ID("id");
@@ -48,158 +33,145 @@ namespace {
     const Name FIELD_MSG("message");
 };
 
-class SimpleFieldInfoExample
+int ID_LEN;
+int MNEMONIC_LEN;
+int DESC_LEN;
+string PADDING;
+string APIFLDS_SVC;
+string d_host;
+int d_port;
+
+void printUsage()
 {
+    writefln( "Usage:\n"
+         "    Retrieve reference data \n"
+         "        [-ip        <ipAddress  = localhost>\n"
+         "        [-p         <tcpPort    = 8194>\n");
+}
 
-    int ID_LEN;
-    int MNEMONIC_LEN;
-    int DESC_LEN;
-    std::string PADDING;
-    std::string APIFLDS_SVC;
-    std::string         d_host;
-    int                 d_port;
-
-    void printUsage()
+bool parseCommandLine(string[] argv)
+{
+    foreach(i; 1..argv.length)
     {
-        std::cout << "Usage:" << std::endl
-            << "    Retrieve reference data " << std::endl
-            << "        [-ip        <ipAddress  = localhost>" << std::endl
-            << "        [-p         <tcpPort    = 8194>" << std::endl;
-    }
-
-    bool parseCommandLine(int argc, char **argv)
-    {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i],"-ip") && i + 1 < argc) {
-                d_host = argv[++i];
-                continue;
-            }
-            if (!std::strcmp(argv[i],"-p") &&  i + 1 < argc) {
-                d_port = std::atoi(argv[++i]);
-                continue;
-            }
-            printUsage();
-            return false;
+        if (!(argv[i]=="-ip") && (i + 1 < argv.length)) {
+            d_host = argv[++i];
+            continue;
         }
-        return true;
-    }
-
-    std::string padString(std::string str, unsigned int width)
-    {
-        if (str.length() >= width || str.length() >= PADDING.length() ) return str;
-        else return str + PADDING.substr(0, width-str.length());
-    }
-
-    void printField (const Element &field)
-    {
-        std::string  fldId = field.getElementAsString(FIELD_ID);
-        if (field.hasElement(FIELD_INFO)) {
-            Element fldInfo          = field.getElement (FIELD_INFO) ;
-            std::string  fldMnemonic =
-                fldInfo.getElementAsString(FIELD_MNEMONIC);
-            std::string  fldDesc     =
-                fldInfo.getElementAsString(FIELD_DESC);
-
-            std::cout << padString(fldId, ID_LEN)
-                << padString(fldMnemonic, MNEMONIC_LEN)
-                << padString(fldDesc, DESC_LEN) << std::endl;
+        if (!(argv[i]=="-p") &&  (i + 1 < argv.length)) {
+            d_port = atoi(argv[++i]);
+            continue;
         }
-        else {
-            Element fldError = field.getElement(FIELD_ERROR) ;
-            std::string  errorMsg = fldError.getElementAsString(FIELD_MSG) ;
+        printUsage();
+        return false;
+    }
+    return true;
+}
 
-            std::cout << std::endl << " ERROR: " << fldId << " - "
-                << errorMsg << std::endl ;
-        }
+string padString(string str, uint width)
+{
+    if (str.length() >= width || str.length() >= PADDING.length() ) return str;
+    else return str ~ PADDING.substr(0, width-str.length());
+}
+
+void printField (const Element &field)
+{
+    string  fldId = field.getElementAsString(FIELD_ID);
+    if (field.hasElement(FIELD_INFO)) {
+        Element fldInfo          = field.getElement (FIELD_INFO) ;
+        string  fldMnemonic = fldInfo.getElementAsString(FIELD_MNEMONIC);
+        string fldDesc     = fldInfo.getElementAsString(FIELD_DESC);
+
+        writefln("%s %s %s",padString(fldId, ID_LEN),padString(fldMnemonic, MNEMONIC_LEN), padString(fldDesc, DESC_LEN));
+         << std::endl;
     }
-    void printHeader ()
-    {
-        std::cout << padString("FIELD ID", ID_LEN) +
-            padString("MNEMONIC", MNEMONIC_LEN) +
-            padString("DESCRIPTION", DESC_LEN)
-            << std::endl;
-        std::cout << padString("-----------", ID_LEN) +
-            padString("-----------", MNEMONIC_LEN) +
-            padString("-----------", DESC_LEN)
-            << std::endl;
+    else {
+        Element fldError = field.getElement(FIELD_ERROR) ;
+        string  errorMsg = fldError.getElementAsString(FIELD_MSG) ;
+
+        writefln(" ERROR: %s - %s", fldId, errorMsg);
     }
+}
+void printHeader ()
+{
+    writefln("%s %s %s",padString("FIELD ID", ID_LEN),padString("MNEMONIC", MNEMONIC_LEN),padString("DESCRIPTION", DESC_LEN));
+    writefln("%s %s %s",padString("-----------", ID_LEN), padString("-----------", MNEMONIC_LEN), padString("-----------", DESC_LEN));
+}
 
 
 public:
-    SimpleFieldInfoExample():
-      PADDING("                                            "),
-          APIFLDS_SVC("//blp/apiflds") {
-              ID_LEN         = 13;
-              MNEMONIC_LEN   = 36;
-              DESC_LEN       = 40;
+SimpleFieldInfoExample():
+PADDING("                                            "),
+    APIFLDS_SVC("//blp/apiflds") {
+        ID_LEN         = 13;
+        MNEMONIC_LEN   = 36;
+        DESC_LEN       = 40;
+}
+
+void run(string[] argv)
+{
+  d_host = "localhost";
+  d_port = 8194;
+  if (!parseCommandLine(argc, argv)) return;
+
+  SessionOptions sessionOptions;
+  sessionOptions.setServerHost(d_host.c_str());
+  sessionOptions.setServerPort(d_port);
+
+  writefln("Connecting to %s:%s",  d_host , d_port);
+  Session session(sessionOptions);
+  if (!session.start()) {
+      stderr.writefln("Failed to start session.");
+      return;
+  }
+  if (!session.openService(APIFLDS_SVC.c_str())) {
+      stderr.writefln("Failed to open %s",APIFLDS_SVC);
+      return;
+  }
+
+  Service fieldInfoService = session.getService(APIFLDS_SVC.c_str());
+  Request request = fieldInfoService.createRequest("FieldInfoRequest");
+  request.append("id", "LAST_PRICE");
+  request.append("id", "pq005");
+  request.append("id", "zz0002");
+
+  request.set("returnFieldDocumentation", true);
+
+  writefln("Sending Request: %s" ,request);
+  session.sendRequest(request, CorrelationId(this));
+
+  while (true) {
+      Event event = session.nextEvent();
+      if (event.eventType() != Event::RESPONSE &&
+          event.eventType() != Event::PARTIAL_RESPONSE) {
+              continue;
       }
 
-      void run(int argc, char **argv)
-      {
-          d_host = "localhost";
-          d_port = 8194;
-          if (!parseCommandLine(argc, argv)) return;
-
-          SessionOptions sessionOptions;
-          sessionOptions.setServerHost(d_host.c_str());
-          sessionOptions.setServerPort(d_port);
-
-          std::cout << "Connecting to " <<  d_host << ":" << d_port << std::endl;
-          Session session(sessionOptions);
-          if (!session.start()) {
-              std::cerr <<"Failed to start session." << std::endl;
-              return;
-          }
-          if (!session.openService(APIFLDS_SVC.c_str())) {
-              std::cerr <<"Failed to open " << APIFLDS_SVC << std::endl;
-              return;
-          }
-
-          Service fieldInfoService = session.getService(APIFLDS_SVC.c_str());
-          Request request = fieldInfoService.createRequest("FieldInfoRequest");
-          request.append("id", "LAST_PRICE");
-          request.append("id", "pq005");
-          request.append("id", "zz0002");
-
-          request.set("returnFieldDocumentation", true);
-
-          std::cout << "Sending Request: " << request << std::endl;
-          session.sendRequest(request, CorrelationId(this));
-
-          while (true) {
-              Event event = session.nextEvent();
-              if (event.eventType() != Event::RESPONSE &&
-                  event.eventType() != Event::PARTIAL_RESPONSE) {
-                      continue;
-              }
-
-              MessageIterator msgIter(event);
-              while (msgIter.next()) {
-                  Message msg = msgIter.message();
-                  Element fields = msg.getElement("fieldData");
-                  int numElements = fields.numValues();
-                  printHeader();
-                  for (int i=0; i < numElements; i++) {
-                      printField (fields.getValueAsElement(i));
-                  }
-                  std::cout << std::endl;
-              }
-              if (event.eventType() == Event::RESPONSE) {
-                  break;
-              }
+      MessageIterator msgIter(event);
+      while (msgIter.next()) {
+          Message msg = msgIter.message();
+          Element fields = msg.getElement("fieldData");
+          int numElements = fields.numValues();
+          printHeader();
+          for (int i=0; i < numElements; i++) {
+              printField (fields.getValueAsElement(i));
           }
       }
-};
+      if (event.eventType() == Event::RESPONSE) {
+          break;
+      }
+  }
+}
 
-int main(int argc, char **argv){
+int main(string[] argv)
+{
     SimpleFieldInfoExample example;
     try {
         example.run(argc, argv);
     } catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description() << std::endl;
+        stderr.writefln("Library Exception!!! %s", e.description());
     }
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
+    writefln("Press ENTER to quit");
     char dummy[2];
     std::cin.getline(dummy, 2);
     return 0;

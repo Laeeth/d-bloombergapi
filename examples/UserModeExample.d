@@ -275,9 +275,6 @@ class UserModeExample {
     }
 
 
-
-public:
-
     UserModeExample()
     : d_host("localhost")
     , d_port(8194)
@@ -329,22 +326,21 @@ public:
         }
 
         session.stop();
-        std::cout << "Exiting...\n";
+        writefln("Exiting...");
     }
 
 };
 
-int main(int argc, char **argv)
+int main(string[] argv)
 {
-    std::cout << "UserModeExample" << std::endl;
+    writefln("UserModeExample");
     UserModeExample example;
     try {
         example.run(argc, argv);
     } catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description()
-                  << std::endl;
+        stderr.writeln("Library Exception!!! %s", e.description());
     } catch (...) {
-        std::cerr << "Unknown Exception!!!" << std::endl;
+        stderr.writefln("Unknown Exception!!!");
     }
 
     // wait for enter key to exit application

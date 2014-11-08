@@ -17,25 +17,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "BlpThreadUtil.h"
-
-#include <blpapi_element.h>
-#include <blpapi_event.h>
-#include <blpapi_eventformatter.h>
-#include <blpapi_message.h>
-#include <blpapi_name.h>
-#include <blpapi_providersession.h>
-#include <blpapi_topiclist.h>
-#include <blpapi_topic.h>
-#include <blpapi_identity.h>
-
-#include <ctime>
-#include <cstdio>
-#include <iostream>
-#include <iterator>
-#include <map>
-#include <sstream>
-#include <string>
+import std.stdio;
+import std.file;
+import std.string;
+import std.containers;
+import std.conv;
+import std.algorithm;
+import blp_api;
 
 using namespace BloombergLP;
 using namespace blpapi;

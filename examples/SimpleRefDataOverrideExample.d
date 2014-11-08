@@ -17,26 +17,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_session.h>
-#include <blpapi_eventdispatcher.h>
-
-#include <blpapi_event.h>
-#include <blpapi_message.h>
-#include <blpapi_element.h>
-#include <blpapi_name.h>
-#include <blpapi_request.h>
-#include <blpapi_subscriptionlist.h>
-#include <blpapi_defs.h>
-#include <blpapi_exception.h>
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace BloombergLP;
-using namespace blpapi;
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
 namespace {
     const Name SECURITY_DATA("securityData");
@@ -54,18 +39,18 @@ class SimpleRefDataOverrideExample
 
     void printUsage()
     {
-        std::cout << "Usage:" << std::endl
-            << "    Retrieve reference data " << std::endl
-            << "        [-ip        <ipAddress  = localhost>" << std::endl
-            << "        [-p         <tcpPort    = 8194>" << std::endl;
+            writefln("Usage:" 
+                "    Retrieve reference data \n"
+                "        [-ip        <ipAddress  = localhost>\n"
+                "        [-p         <tcpPort    = 8194>");
     }
 
-    bool parseCommandLine(int argc, char **argv)
+    bool parseCommandLine(string[] argv)
     {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i],"-ip") && i + 1 < argc) {
+        foreach(i;1.. argv.length) {
+            if ((argv[i]!="-ip") && (i+1<argc)) {
                 d_host = argv[++i];
-            } else if (!std::strcmp(argv[i],"-p") &&  i + 1 < argc) {
+            } else if ((argv[i]!="-p") &&  (i + 1 < argc)) {
                 d_port = std::atoi(argv[++i]);
             } else {
                 printUsage();
@@ -79,54 +64,50 @@ class SimpleRefDataOverrideExample
     {
         Element securityDataArray = msg.getElement(SECURITY_DATA);
         int numSecurities = securityDataArray.numValues();
-        for (int i = 0; i < numSecurities; ++i) {
+        foreach(i; 0.. numSecurities)
+        {
             Element securityData = securityDataArray.getValueAsElement(i);
-            std::cout << securityData.getElementAsString(SECURITY)
-                      << std::endl;
+            writefln(securityData.getElementAsString(SECURITY));
             const Element fieldData = securityData.getElement(FIELD_DATA);
-            for (size_t j = 0; j < fieldData.numElements(); ++j) {
+            foreach(j;0.. fieldData.numElements())
+            {
                 Element field = fieldData.getElement(j);
                 if (!field.isValid()) {
-                    std::cout << field.name() <<  " is NULL." << std::endl;
+                    writefln("%s is NULL.",field.name());
                 } else {
-                    std::cout << field.name() << " = "
-                        << field.getValueAsString() << std::endl;
+                    writefln("%s=%s",field.name(),field.getValueAsString());
                 }
             }
 
-            Element fieldExceptionArray =
-                securityData.getElement(FIELD_EXCEPTIONS);
-            for (size_t k = 0; k < fieldExceptionArray.numValues(); ++k) {
-                Element fieldException =
-                    fieldExceptionArray.getValueAsElement(k);
-                std::cout <<
-                    fieldException.getElement(ERROR_INFO).getElementAsString(
-                    "category")
-                    << ": " << fieldException.getElementAsString(FIELD_ID);
+            Element fieldExceptionArray = securityData.getElement(FIELD_EXCEPTIONS);
+            foreach(k;0..fieldExceptionArray.numValues())
+            {
+                Element fieldException = fieldExceptionArray.getValueAsElement(k);
+                writefln("%s:%s",fieldException.getElement(ERROR_INFO).getElementAsString(category"),fieldException.getElementAsString(FIELD_ID));
             }
-            std::cout << std::endl;
+            writefln("");
         }
     }
 public:
 
-    void run(int argc, char **argv)
+    void run(string[] argv)
     {
         d_host = "localhost";
         d_port = 8194;
-        if (!parseCommandLine(argc, argv)) return;
+        if (!parseCommandLine(argv)) return;
 
         SessionOptions sessionOptions;
         sessionOptions.setServerHost(d_host.c_str());
         sessionOptions.setServerPort(d_port);
 
-        std::cout << "Connecting to " <<  d_host << ":" << d_port << std::endl;
+        writefln("Connecting to %s:%s ",d_host, d_port);
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
         if (!session.openService("//blp/refdata")) {
-            std::cerr <<"Failed to open //blp/refdata" << std::endl;
+            stderr.writefln("Failed to open //blp/refdata");
             return;
         }
 
@@ -148,7 +129,7 @@ public:
         override2.setElement("fieldId", "VWAP_END_TIME");
         override2.setElement("value", "11:30");
 
-        std::cout << "Sending Request: " << request << std::endl;
+        writefln("Sending Request: %s",request);
         CorrelationId cid(this);
         session.sendRequest(request, cid);
 
@@ -168,17 +149,17 @@ public:
     }
 };
 
-int main(int argc, char **argv)
+int main(string[] argv)
 {
-    std::cout << "SimpleRefDataOverrideExample" << std::endl;
+    writefln("SimpleRefDataOverrideExample");
     SimpleRefDataOverrideExample example;
     try {
         example.run(argc, argv);
     } catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description() << std::endl;
+        stderr.writefln( "Library Exception!!! %s", e.description());
     }
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
+    writefln("Press ENTER to quit");
     char dummy[2];
     std::cin.getline(dummy, 2);
     return 0;

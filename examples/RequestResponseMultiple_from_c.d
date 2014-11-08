@@ -1,13 +1,13 @@
 /* RequestResponseParadigm_from_c.d */
 import std.stdio;
 import std.string;
-import blp;
+import blpapi;
 
 static int streamWriter(const char* data, int length, void *stream)
 {
 	assert(data);
 	assert(stream);
-	return fwrite(data, length, 1, (FILE *)stream);
+	return cast(int) fwrite(data, length, 1, cast(FILE *)stream);
 }
 static void handleResponseEvent(const blpapi_Event_t *event)
 {
@@ -30,12 +30,12 @@ static void handleResponseEvent(const blpapi_Event_t *event)
 		}
 		blpapi_Element_getElement(referenceDataResponse, &securityDataArray, "securityData", 0);
 		numItems = blpapi_Element_numValues(securityDataArray);
-		foreach(i;0...numItems)
+		foreach(i;0..numItems)
 		{
-			blpapi_Element_t *securityData = 0;
-			blpapi_Element_t *securityElement = 0;
+			blpapi_Element_t* securityData = cast(blpapi_Element_t*)0;
+			blpapi_Element_t* securityElement = cast(blpapi_Element_t*)0;
 			const char *security = 0;
-			blpapi_Element_t *sequenceNumberElement = 0;
+			blpapi_Element_t* sequenceNumberElement = cast(blpapi_Element_t*)0;
 			int sequenceNumber = -1;
 			blpapi_Element_getValueAsElement(securityDataArray, &securityData, i);
 			assert(securityData);
@@ -54,10 +54,10 @@ static void handleResponseEvent(const blpapi_Event_t *event)
 				blpapi_Element_print(securityErrorElement, &streamWriter, stdout, 0, 4);
 				return;
 			} else {
-				blpapi_Element_t *fieldDataElement = 0;
-				blpapi_Element_t *PX_LAST_Element = 0;
-				blpapi_Element_t *DS002_Element = 0;
-				blpapi_Element_t *VWAP_VOLUME_Element = 0;
+				blpapi_Element_t* fieldDataElement = cast(blpapi_Element_t*)0;
+				blpapi_Element_t* PX_LAST_Element = cast(blpapi_Element_t*)0;
+				blpapi_Element_t* DS002_Element = cast(blpapi_Element_t*)0;
+				blpapi_Element_t* VWAP_VOLUME_Element = cast(blpapi_Element_t*)0;
 				double px_last = cast(double)777;
 				const char *ds002 = cast(const char*)0;
 				double vwap_volume = cast(double)666;
@@ -146,7 +146,7 @@ int main(string[] argv)
 	memset(&requestId, '\0', sizeof(requestId));
 	requestId.size = sizeof(requestId);
 	requestId.valueType = BLPAPI_CORRELATION_TYPE_INT;
-	requestId.value.intValue = (blpapi_UInt64_t)1;
+	requestId.value.intValue = cast(blpapi_UInt64_t)1;
 	blpapi_Session_getService(session, &refDataSvc, "//blp/refdata");
 	blpapi_Service_createRequest(refDataSvc, &request, "ReferenceDataRequest");
 	assert(request);
@@ -164,7 +164,7 @@ int main(string[] argv)
 	memset(&correlationId, '\0', sizeof(correlationId));
 	correlationId.size = sizeof(correlationId);
 	correlationId.valueType = BLPAPI_CORRELATION_TYPE_INT;
-	correlationId.value.intValue = (blpapi_UInt64_t)1;
+	correlationId.value.intValue = cast(blpapi_UInt64_t)1;
 	blpapi_Session_sendRequest(session, request, &correlationId, 0, 0, 0, 0);
 	
 	while (continueToLoop) {

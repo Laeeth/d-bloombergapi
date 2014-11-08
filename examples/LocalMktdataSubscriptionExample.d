@@ -17,20 +17,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_defs.h>
-#include <blpapi_correlationid.h>
-#include <blpapi_element.h>
-#include <blpapi_event.h>
-#include <blpapi_exception.h>
-#include <blpapi_message.h>
-#include <blpapi_session.h>
-#include <blpapi_subscriptionlist.h>
-
-#include <ctime>
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <string.h>
+import std.stdio;
+import std.file;
+import std.string;
+import std.containers;
+import std.conv;
+import std.algorithm;
+import blp_api;
 
 using namespace BloombergLP;
 using namespace blpapi;

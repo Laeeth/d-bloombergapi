@@ -17,121 +17,101 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_session.h>
-#include <blpapi_eventdispatcher.h>
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
-#include <blpapi_event.h>
-#include <blpapi_message.h>
-#include <blpapi_element.h>
-#include <blpapi_name.h>
-#include <blpapi_request.h>
-#include <blpapi_subscriptionlist.h>
-#include <blpapi_defs.h>
-#include <blpapi_exception.h>
+string d_host;
+int d_port;
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace BloombergLP;
-using namespace blpapi;
-
-class SimpleRefDataExample
+void printUsage()
 {
-    std::string         d_host;
-    int                 d_port;
+    writefln("Usage:\n"
+        "    Retrieve reference data \n"
+        "        [-ip        <ipAddress  = localhost>\n"
+        "        [-p         <tcpPort    = 8194>");
+}
 
-    void printUsage()
-    {
-        std::cout << "Usage:" << std::endl
-            << "    Retrieve reference data " << std::endl
-            << "        [-ip        <ipAddress  = localhost>" << std::endl
-            << "        [-p         <tcpPort    = 8194>" << std::endl;
-    }
-
-    bool parseCommandLine(int argc, char **argv)
-    {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i],"-ip") && i + 1 < argc) {
-                d_host = argv[++i];
-                continue;
-            }
-            if (!std::strcmp(argv[i],"-p") &&  i + 1 < argc) {
-                d_port = std::atoi(argv[++i]);
-                continue;
-            }
-            printUsage();
-            return false;
-        }
-        return true;
-    }
-
-public:
-
-    void run(int argc, char **argv)
-    {
-        d_host = "localhost";
-        d_port = 8194;
-        if (!parseCommandLine(argc, argv)) return;
-
-        SessionOptions sessionOptions;
-        sessionOptions.setServerHost(d_host.c_str());
-        sessionOptions.setServerPort(d_port);
-
-        std::cout << "Connecting to " <<  d_host << ":"
-            << d_port << std::endl;
-        Session session(sessionOptions);
-        if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
-            return;
-        }
-        if (!session.openService("//blp/refdata")) {
-            std::cerr <<"Failed to open //blp/refdata" << std::endl;
-            return;
-        }
-
-        Service refDataService = session.getService("//blp/refdata");
-        Request request = refDataService.createRequest("ReferenceDataRequest");
-
-        // append securities to request
-        request.append("securities", "IBM US Equity");
-        request.append("securities", "MSFT US Equity");
-
-        // append fields to request
-        request.append("fields","PX_LAST");
-        request.append("fields","DS002");
-
-
-        std::cout << "Sending Request: " << request << std::endl;
-        session.sendRequest(request);
-
-        while (true) {
-            Event event = session.nextEvent();
-            MessageIterator msgIter(event);
-            while (msgIter.next()) {
-                Message msg = msgIter.message();
-                msg.print(std::cout) << std::endl;
-            }
-            if (event.eventType() == Event::RESPONSE) {
-                break;
-            }
-        }
-    }
-};
-
-int main(int argc, char **argv)
+bool parseCommandLine(string[] argv)
 {
-    std::cout << "SimpleRefDataExample" << std::endl;
+    foreach(i;1.. argv.length)
+    {
+        if (!(argv[i]=="-ip") && (i+1<argc)) {
+            d_host = argv[++i];
+            continue;
+        }
+        if (!(argv[i]=="-p") &&  (i + 1 < argc)) {
+            d_port = atoi(argv[++i]);
+            continue;
+        }
+        printUsage();
+        return false;
+    }
+    return true;
+}
+
+void run(string[] argv)
+{
+    d_host = "localhost";
+    d_port = 8194;
+    if (!parseCommandLine(argc, argv)) return;
+
+    SessionOptions sessionOptions;
+    sessionOptions.setServerHost(d_host.c_str());
+    sessionOptions.setServerPort(d_port);
+
+    writefln("Connecting to %s:%s",d_host, d_port);
+    Session session(sessionOptions);
+    if (!session.start()) {
+        stderr.writefln("Failed to start session.");
+        return;
+    }
+    if (!session.openService("//blp/refdata")) {
+        stderr.writefln("Failed to open //blp/refdata");
+        return;
+    }
+
+    Service refDataService = session.getService("//blp/refdata");
+    Request request = refDataService.createRequest("ReferenceDataRequest");
+
+    // append securities to request
+    request.append("securities", "IBM US Equity");
+    request.append("securities", "MSFT US Equity");
+
+    // append fields to request
+    request.append("fields","PX_LAST");
+    request.append("fields","DS002");
+
+
+    writefln("Sending Request: %s",request);
+    session.sendRequest(request);
+
+    while (true) {
+        Event event = session.nextEvent();
+        MessageIterator msgIter(event);
+        while (msgIter.next()) {
+            Message msg = msgIter.message();
+            msg.print(std::cout) << std::endl;
+        }
+        if (event.eventType() == Event::RESPONSE) {
+            break;
+        }
+    }
+}
+
+int main(string[] argv)
+{
+    writefln("SimpleRefDataExample");
     SimpleRefDataExample example;
     try {
         example.run(argc, argv);
     } catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description() << std::endl;
+        stderr.writefln("Library Exception!!! %s",e.description());
     }
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
+    writefln("Press ENTER to quit");
     char dummy[2];
     std::cin.getline(dummy, 2);
     return 0;

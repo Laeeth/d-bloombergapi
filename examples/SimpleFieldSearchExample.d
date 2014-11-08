@@ -17,26 +17,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_session.h>
-#include <blpapi_eventdispatcher.h>
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
-#include <blpapi_event.h>
-#include <blpapi_message.h>
-#include <blpapi_element.h>
-#include <blpapi_name.h>
-#include <blpapi_request.h>
-#include <blpapi_subscriptionlist.h>
-#include <blpapi_defs.h>
-#include <blpapi_exception.h>
-
-#include <iostream>
-#include <vector>
-#include <string>
-#include <stdlib.h>
-#include <string.h>
-
-using namespace BloombergLP;
-using namespace blpapi;
+string d_host;
+int d_port;
 
 const char * APIFLDS_SVC   = "//blp/apiflds";
 static std::string PADDING = "                                            ";
@@ -51,151 +39,135 @@ namespace {
     const Name FIELD_MSG("message");
 };
 
-class SimpleFieldSearchExample
-{
-    enum {
-        ID_LEN         = 13
-        , MNEMONIC_LEN   = 36
-        , DESC_LEN       = 40
-    };
-
-    std::string   d_host;
-    int           d_port;
-
-    void printUsage()
-    {
-        std::cout
-            << "Usage:" << std::endl
-            << "    Retrieve reference data " << std::endl
-            << "        [-ip        <ipAddress  = localhost>" << std::endl
-            << "        [-p         <tcpPort    = 8194>" << std::endl;
-    }
-
-    bool parseCommandLine(int argc, char **argv)
-    {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i],"-ip") ) {
-                if (++i >= argc) return false;
-                d_host = argv[i];
-            }
-            else if (!std::strcmp(argv[i],"-p")) {
-                if (++i >= argc) return false;
-                d_port = std::atoi(argv[i]);
-            }
-            else return false;
-        }
-        return true;
-    }
-
-    std::string padString(const std::string& str, unsigned int width)
-    {
-        if (str.length() >= width || str.length() >= PADDING.length())
-            return str;
-        else return str + PADDING.substr(0, width-str.length());
-    }
-
-    void printField (const Element &field)
-    {
-        std::string  fldId = field.getElementAsString(FIELD_ID);
-        if (field.hasElement(FIELD_INFO)) {
-            Element fldInfo          = field.getElement (FIELD_INFO) ;
-            std::string  fldMnemonic =
-                fldInfo.getElementAsString(FIELD_MNEMONIC);
-            std::string  fldDesc     =
-                fldInfo.getElementAsString(FIELD_DESC);
-
-            std::cout << padString(fldId, ID_LEN)
-                << padString(fldMnemonic, MNEMONIC_LEN)
-                << padString(fldDesc, DESC_LEN) << std::endl;
-        }
-        else {
-            Element fldError = field.getElement(FIELD_ERROR) ;
-            std::string  errorMsg = fldError.getElementAsString(FIELD_MSG) ;
-
-            std::cout << std::endl << " ERROR: " << fldId << " - "
-                << errorMsg << std::endl ;
-        }
-    }
-
-    void printHeader ()
-    {
-        std::cout << padString("FIELD ID", ID_LEN)
-            << padString("MNEMONIC", MNEMONIC_LEN)
-            << padString("DESCRIPTION", DESC_LEN) << std::endl;
-        std::cout << padString("-----------", ID_LEN)
-            << padString("-----------", MNEMONIC_LEN)
-            << padString("-----------", DESC_LEN) << std::endl;
-    }
-
-
-public:
-    SimpleFieldSearchExample() { }
-
-    void run(int argc, char **argv)
-    {
-        d_host = "localhost";
-        d_port = 8194;
-
-        if (!parseCommandLine(argc, argv)) {
-            printUsage();
-            return;
-        }
-
-        SessionOptions sessionOptions;
-        sessionOptions.setServerHost(d_host.c_str());
-        sessionOptions.setServerPort(d_port);
-
-        std::cout << "Connecting to " <<  d_host << ":" << d_port << std::endl;
-        Session session(sessionOptions);
-
-        if (!session.start()) {
-            std::cerr << "Failed to start session." << std::endl;
-            return;
-        }
-
-        if (!session.openService(APIFLDS_SVC)) {
-            std::cerr <<"Failed to open " << APIFLDS_SVC << std::endl;
-            return;
-        }
-
-        Service fieldInfoService = session.getService(APIFLDS_SVC);
-        Request request = fieldInfoService.createRequest("FieldSearchRequest");
-        request.set ("searchSpec", "last price");
-        Element exclude = request.getElement("exclude");
-        exclude.setElement("fieldType", "Static");
-        request.set ("returnFieldDocumentation", false);
-
-        std::cout << "Sending Request: " << request << std::endl;
-        session.sendRequest(request);
-
-        printHeader();
-        while (true) {
-            Event event = session.nextEvent();
-
-            if (event.eventType() != Event::RESPONSE &&
-                event.eventType() != Event::PARTIAL_RESPONSE) {
-                    continue;
-            }
-
-            MessageIterator msgIter(event);
-            while (msgIter.next()) {
-                Message msg = msgIter.message();
-                Element fields = msg.getElement("fieldData");
-                int numElements = fields.numValues();
-
-                for (int i=0; i < numElements; i++) {
-                    printField (fields.getValueAsElement(i));
-                }
-                std::cout << std::endl;
-            }
-            if (event.eventType() == Event::RESPONSE) {
-                break;
-            }
-        }
-    }
+enum {
+    ID_LEN         = 13,
+    MNEMONIC_LEN   = 36,
+    DESC_LEN       = 40,
 };
 
-int main(int argc, char **argv)
+string d_host;
+int d_port;
+
+void printUsage()
+{
+    writefln("Usage:\n"
+        "    Retrieve reference data \n"
+        "        [-ip        <ipAddress  = localhost>\n"
+        "        [-p         <tcpPort    = 8194>\n");
+}
+
+bool parseCommandLine(string[] argv)
+{
+    foreach(i;1..argv.length)
+    {
+        if (!(argv[i]=="-ip") ) {
+            if (++i >= argv.length) return false;
+            d_host = argv[i];
+        }
+        else if (!(argv[i]=="-p")) {
+            if (++i >= argv.length) return false;
+            d_port = atoi(argv[i]);
+        }
+        else return false;
+    }
+    return true;
+}
+
+string padString(string str, uint width)
+{
+    if (str.length() >= width || str.length() >= PADDING.length())
+        return str;
+    else return str ~ PADDING.substr(0, width-str.length());
+}
+
+void printField (const Element &field)
+{
+    string  fldId = field.getElementAsString(FIELD_ID);
+    if (field.hasElement(FIELD_INFO)) {
+        Element fldInfo          = field.getElement (FIELD_INFO) ;
+        string fldMnemonic = fldInfo.getElementAsString(FIELD_MNEMONIC);
+        string  fldDesc     = fldInfo.getElementAsString(FIELD_DESC);
+        writefln("%s %s %s",padString(fldId, ID_LEN), padString(fldMnemonic, MNEMONIC_LEN), padString(fldDesc, DESC_LEN));
+    }
+    else {
+        Element fldError = field.getElement(FIELD_ERROR) ;
+        string errorMsg = fldError.getElementAsString(FIELD_MSG) ;
+
+        writefln("\nERROR: ^s, - %s " fldId, errorMsg);
+    }
+}
+
+void printHeader ()
+{
+    writefln("%s %s %s",padString("FIELD ID", ID_LEN), padString("MNEMONIC", MNEMONIC_LEN), padString("DESCRIPTION", DESC_LEN));
+    writefln("%s %s %2",padString("-----------", ID_LEN),  padString("-----------", MNEMONIC_LEN), padString("-----------", DESC_LEN));
+}
+
+
+void run(string[] argv)
+{
+    d_host = "localhost";
+    d_port = 8194;
+
+    if (!parseCommandLine(argv)) {
+        printUsage();
+        return;
+    }
+
+    SessionOptions sessionOptions;
+    sessionOptions.setServerHost(d_host.c_str());
+    sessionOptions.setServerPort(d_port);
+
+    writefln("Connecting to %s:%s" d_host, d_port);
+    Session session(sessionOptions);
+
+    if (!session.start()) {
+        stderr.writefln("Failed to start session.");
+        return;
+    }
+
+    if (!session.openService(APIFLDS_SVC)) {
+        stderr.writefln("Failed to open %s",APIFLDS_SVC);
+        return;
+    }
+
+    Service fieldInfoService = session.getService(APIFLDS_SVC);
+    Request request = fieldInfoService.createRequest("FieldSearchRequest");
+    request.set ("searchSpec", "last price");
+    Element exclude = request.getElement("exclude");
+    exclude.setElement("fieldType", "Static");
+    request.set ("returnFieldDocumentation", false);
+
+    writefln("Sending Request: %s", request);
+    session.sendRequest(request);
+
+    printHeader();
+    while (true) {
+        Event event = session.nextEvent();
+
+        if (event.eventType() != Event::RESPONSE &&
+            event.eventType() != Event::PARTIAL_RESPONSE) {
+                continue;
+        }
+
+        MessageIterator msgIter(event);
+        while (msgIter.next()) {
+            Message msg = msgIter.message();
+            Element fields = msg.getElement("fieldData");
+            int numElements = fields.numValues();
+
+            for (int i=0; i < numElements; i++) {
+                printField (fields.getValueAsElement(i));
+            }
+        }
+        if (event.eventType() == Event::RESPONSE) {
+            break;
+        }
+    }
+}
+};
+
+int main(string[] argv)
 {
     SimpleFieldSearchExample example;
 
@@ -203,14 +175,14 @@ int main(int argc, char **argv)
         example.run(argc, argv);
     }
     catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description() << std::endl;
+        stderr.writefln("Library Exception!!! %s",e.description());
     }
     catch (...) {
-        std::cerr << "Unknow exception!" << std::endl;
+        stderr.writefln("Unknown exception!");
     }
 
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
+    writefln("Press ENTER to quit");
     char dummy[2];
     std::cin.getline(dummy, 2);
     return 0;

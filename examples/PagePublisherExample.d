@@ -17,28 +17,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "BlpThreadUtil.h"
-
-#include <blpapi_element.h>
-#include <blpapi_event.h>
-#include <blpapi_eventformatter.h>
-#include <blpapi_message.h>
-#include <blpapi_name.h>
-#include <blpapi_providersession.h>
-#include <blpapi_topiclist.h>
-#include <blpapi_topic.h>
-#include <blpapi_identity.h>
-
-#include <cassert>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <iterator>
-#include <map>
-#include <sstream>
-#include <string>
-
-#include "BlpThreadUtil.h"
+import std.stdio;
+import std.file;
+import std.string;
+import std.containers;
+import std.conv;
+import std.algorithm;
+import blp_api;
 
 using namespace BloombergLP;
 using namespace blpapi;
@@ -334,270 +319,265 @@ bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
     return true;
 }
 
-class PagePublisherExample
+string d_hosts;
+int d_port;
+int d_priority;
+string d_service;
+string d_groupId;
+string d_authOptions;
+
+void printUsage()
 {
-    std::vector<std::string> d_hosts;
-    int                      d_port;
-    int                      d_priority;
-    std::string              d_service;
-    std::string              d_groupId;
-    std::string              d_authOptions;
+    writefln("Publish on a topic. \n"
+         "Usage:\n" 
+         "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)\n"
+         "\t[-p    <tcpPort>]    \tserver port (default: 8194)\n"
+         "\t[-s    <service>]    \tservice name (default: //viper/page)\n"
+         "\t[-g    <groupId>]    \tpublisher groupId (defaults to unique value)\n"
+         "\t[-pri  <priority>]   \tset publisher priority level (default: 10)\n"
+         "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)\n");
+}
 
-    void printUsage()
+bool parseCommandLine(string[] argv)
+{
+    foreach(i;1.. argv.length)
     {
-        std::cout
-            << "Publish on a topic. " << std::endl
-            << "Usage:" << std::endl
-            << "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" << std::endl
-            << "\t[-p    <tcpPort>]    \tserver port (default: 8194)" << std::endl
-            << "\t[-s    <service>]    \tservice name (default: //viper/page)" << std::endl
-            << "\t[-g    <groupId>]    \tpublisher groupId (defaults to unique value)" << std::endl
-            << "\t[-pri  <priority>]   \tset publisher priority level (default: 10)" << std::endl
-            << "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)" << std::endl;
-    }
-
-    bool parseCommandLine(int argc, char **argv)
-    {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i], "-ip") && i + 1 < argc)
-                d_hosts.push_back(argv[++i]);
-            else if (!std::strcmp(argv[i], "-p") &&  i + 1 < argc)
-                d_port = std::atoi(argv[++i]);
-            else if (!std::strcmp(argv[i], "-s") &&  i + 1 < argc)
-                d_service = argv[++i];
-            else if (!std::strcmp(argv[i],"-g") && i + 1 < argc)
-                d_groupId = argv[++i];
-            else if (!std::strcmp(argv[i],"-pri") && i + 1 < argc)
-                d_priority = std::atoi(argv[++i]);
-            else if (!std::strcmp(argv[i], "-auth") && i + 1 < argc) {
-                ++ i;
-                if (!std::strcmp(argv[i], AUTH_OPTION_NONE)) {
-                    d_authOptions.clear();
-                }
-                else if (strncmp(argv[i], AUTH_OPTION_APP, strlen(AUTH_OPTION_APP)) == 0) {
-                    d_authOptions.clear();
-                    d_authOptions.append(AUTH_APP_PREFIX);
-                    d_authOptions.append(argv[i] + strlen(AUTH_OPTION_APP));
-                }
-                else if (strncmp(argv[i], AUTH_OPTION_USER_APP, strlen(AUTH_OPTION_USER_APP)) == 0) {
-                    d_authOptions.clear();
-                    d_authOptions.append(AUTH_USER_APP_PREFIX);
-                    d_authOptions.append(argv[i] + strlen(AUTH_OPTION_USER_APP));
-                }
-                else if (strncmp(argv[i], AUTH_OPTION_DIR, strlen(AUTH_OPTION_DIR)) == 0) {
-                    d_authOptions.clear();
-                    d_authOptions.append(AUTH_DIR_PREFIX);
-                    d_authOptions.append(argv[i] + strlen(AUTH_OPTION_DIR));
-                }
-                else if (!std::strcmp(argv[i], AUTH_OPTION_USER)) {
-                    d_authOptions.assign(AUTH_USER);
-                }
-                else {
-                    printUsage();
-                    return false;
-                }
+        if (!std::strcmp(argv[i], "-ip") && i + 1 < argc)
+            d_hosts.push_back(argv[++i]);
+        else if (!std::strcmp(argv[i], "-p") &&  i + 1 < argc)
+            d_port = std::atoi(argv[++i]);
+        else if (!std::strcmp(argv[i], "-s") &&  i + 1 < argc)
+            d_service = argv[++i];
+        else if (!std::strcmp(argv[i],"-g") && i + 1 < argc)
+            d_groupId = argv[++i];
+        else if (!std::strcmp(argv[i],"-pri") && i + 1 < argc)
+            d_priority = std::atoi(argv[++i]);
+        else if (!std::strcmp(argv[i], "-auth") && i + 1 < argc) {
+            ++ i;
+            if (!std::strcmp(argv[i], AUTH_OPTION_NONE)) {
+                d_authOptions.clear();
+            }
+            else if (strncmp(argv[i], AUTH_OPTION_APP, strlen(AUTH_OPTION_APP)) == 0) {
+                d_authOptions.clear();
+                d_authOptions.append(AUTH_APP_PREFIX);
+                d_authOptions.append(argv[i] + strlen(AUTH_OPTION_APP));
+            }
+            else if (strncmp(argv[i], AUTH_OPTION_USER_APP, strlen(AUTH_OPTION_USER_APP)) == 0) {
+                d_authOptions.clear();
+                d_authOptions.append(AUTH_USER_APP_PREFIX);
+                d_authOptions.append(argv[i] + strlen(AUTH_OPTION_USER_APP));
+            }
+            else if (strncmp(argv[i], AUTH_OPTION_DIR, strlen(AUTH_OPTION_DIR)) == 0) {
+                d_authOptions.clear();
+                d_authOptions.append(AUTH_DIR_PREFIX);
+                d_authOptions.append(argv[i] + strlen(AUTH_OPTION_DIR));
+            }
+            else if (!std::strcmp(argv[i], AUTH_OPTION_USER)) {
+                d_authOptions.assign(AUTH_USER);
             }
             else {
                 printUsage();
                 return false;
             }
         }
-
-        if (d_hosts.size() == 0) {
-            d_hosts.push_back("localhost");
-        }
-
-        return true;
-    }
-
-public:
-
-    PagePublisherExample()
-        : d_port(8194)
-        , d_service("//viper/page")
-        , d_authOptions(AUTH_USER)
-        , d_priority(10)
-    {
-    }
-
-    bool authorize(const Service &authService,
-                   Identity *providerIdentity,
-                   ProviderSession *session,
-                   const CorrelationId &cid)
-    {
-        {
-            MutexGuard guard(&g_lock);
-            g_authorizationStatus[cid] = WAITING;
-        }
-        EventQueue tokenEventQueue;
-        session->generateToken(CorrelationId(), &tokenEventQueue);
-        std::string token;
-        Event event = tokenEventQueue.nextEvent();
-        if (event.eventType() == Event::TOKEN_STATUS ||
-            event.eventType() == Event::REQUEST_STATUS) {
-            MessageIterator iter(event);
-            while (iter.next()) {
-                Message msg = iter.message();
-                {
-                    MutexGuard guard(&g_lock);
-                    msg.print(std::cout);
-                }
-                if (msg.messageType() == TOKEN_SUCCESS) {
-                    token = msg.getElementAsString(TOKEN);
-                }
-                else if (msg.messageType() == TOKEN_FAILURE) {
-                    break;
-                }
-            }
-        }
-        if (token.length() == 0) {
-            MutexGuard guard(&g_lock);
-            std::cout << "Failed to get token" << std::endl;
+        else {
+            printUsage();
             return false;
         }
+    }
 
-        Request authRequest = authService.createAuthorizationRequest();
-        authRequest.set(TOKEN, token.c_str());
+    if (d_hosts.size() == 0) {
+        d_hosts.push_back("localhost");
+    }
 
-        session->sendAuthorizationRequest(
-            authRequest,
-            providerIdentity,
-            cid);
+    return true;
+}
 
-        time_t startTime = time(0);
-        const int WAIT_TIME_SECONDS = 10;
-        while (true) {
+PagePublisherExample()
+    : d_port(8194)
+    , d_service("//viper/page")
+    , d_authOptions(AUTH_USER)
+    , d_priority(10)
+{
+}
+
+bool authorize(const Service &authService,
+               Identity *providerIdentity,
+               ProviderSession *session,
+               const CorrelationId &cid)
+{
+    {
+        MutexGuard guard(&g_lock);
+        g_authorizationStatus[cid] = WAITING;
+    }
+    EventQueue tokenEventQueue;
+    session->generateToken(CorrelationId(), &tokenEventQueue);
+    std::string token;
+    Event event = tokenEventQueue.nextEvent();
+    if (event.eventType() == Event::TOKEN_STATUS ||
+        event.eventType() == Event::REQUEST_STATUS) {
+        MessageIterator iter(event);
+        while (iter.next()) {
+            Message msg = iter.message();
             {
                 MutexGuard guard(&g_lock);
-                if (WAITING != g_authorizationStatus[cid]) {
-                    return AUTHORIZED == g_authorizationStatus[cid];
-                }
+                msg.print(std::cout);
             }
-            time_t endTime = time(0);
-            if (endTime - startTime > WAIT_TIME_SECONDS) {
-                return false;
+            if (msg.messageType() == TOKEN_SUCCESS) {
+                token = msg.getElementAsString(TOKEN);
             }
-            SLEEP(1);
+            else if (msg.messageType() == TOKEN_FAILURE) {
+                break;
+            }
+        }
+    }
+    if (token.length() == 0) {
+        MutexGuard guard(&g_lock);
+        std::cout << "Failed to get token" << std::endl;
+        return false;
+    }
+
+    Request authRequest = authService.createAuthorizationRequest();
+    authRequest.set(TOKEN, token.c_str());
+
+    session->sendAuthorizationRequest(
+        authRequest,
+        providerIdentity,
+        cid);
+
+    time_t startTime = time(0);
+    const int WAIT_TIME_SECONDS = 10;
+    while (true) {
+        {
+            MutexGuard guard(&g_lock);
+            if (WAITING != g_authorizationStatus[cid]) {
+                return AUTHORIZED == g_authorizationStatus[cid];
+            }
+        }
+        time_t endTime = time(0);
+        if (endTime - startTime > WAIT_TIME_SECONDS) {
+            return false;
+        }
+        SLEEP(1);
+    }
+}
+
+void run(int argc, char **argv)
+{
+    if (!parseCommandLine(argc, argv))
+        return;
+
+    SessionOptions sessionOptions;
+    for (size_t i = 0; i < d_hosts.size(); ++i) {
+        sessionOptions.setServerAddress(d_hosts[i].c_str(), d_port, i);
+    }
+    sessionOptions.setAuthenticationOptions(d_authOptions.c_str());
+    sessionOptions.setAutoRestartOnDisconnection(true);
+    sessionOptions.setNumStartAttempts(d_hosts.size());
+
+    std::cout << "Connecting to port " << d_port
+              << " on ";
+    std::copy(d_hosts.begin(),
+              d_hosts.end(),
+              std::ostream_iterator<std::string>(std::cout, " "));
+    std::cout << std::endl;
+
+    MyEventHandler myEventHandler(d_service);
+    ProviderSession session(sessionOptions, &myEventHandler, 0);
+    if (!session.start()) {
+        std::cerr <<"Failed to start session." << std::endl;
+        return;
+    }
+
+    Identity providerIdentity = session.createIdentity();
+    if (!d_authOptions.empty()) {
+        bool isAuthorized = false;
+        const char* authServiceName = "//blp/apiauth";
+        if (session.openService(authServiceName)) {
+            Service authService = session.getService(authServiceName);
+            isAuthorized = authorize(authService, &providerIdentity,
+                    &session, CorrelationId((void *)"auth"));
+        }
+        if (!isAuthorized) {
+            std::cerr << "No authorization" << std::endl;
+            return;
         }
     }
 
-    void run(int argc, char **argv)
-    {
-        if (!parseCommandLine(argc, argv))
-            return;
+    ServiceRegistrationOptions serviceOptions;
+    serviceOptions.setGroupId(d_groupId.c_str(), d_groupId.size());
+    serviceOptions.setServicePriority(d_priority);
+    if (!session.registerService(d_service.c_str(), providerIdentity, serviceOptions)) {
+        std::cerr <<"Failed to register " << d_service << std::endl;
+        return;
+    }
 
-        SessionOptions sessionOptions;
-        for (size_t i = 0; i < d_hosts.size(); ++i) {
-            sessionOptions.setServerAddress(d_hosts[i].c_str(), d_port, i);
-        }
-        sessionOptions.setAuthenticationOptions(d_authOptions.c_str());
-        sessionOptions.setAutoRestartOnDisconnection(true);
-        sessionOptions.setNumStartAttempts(d_hosts.size());
+    Service service = session.getService(d_service.c_str());
 
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
-        std::copy(d_hosts.begin(),
-                  d_hosts.end(),
-                  std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << std::endl;
-
-        MyEventHandler myEventHandler(d_service);
-        ProviderSession session(sessionOptions, &myEventHandler, 0);
-        if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
-            return;
-        }
-
-        Identity providerIdentity = session.createIdentity();
-        if (!d_authOptions.empty()) {
-            bool isAuthorized = false;
-            const char* authServiceName = "//blp/apiauth";
-            if (session.openService(authServiceName)) {
-                Service authService = session.getService(authServiceName);
-                isAuthorized = authorize(authService, &providerIdentity,
-                        &session, CorrelationId((void *)"auth"));
+    // Now we will start publishing
+    int value=1;
+    while (g_running) {
+        Event event = service.createPublishEvent();
+        {
+            MutexGuard guard(&g_mutex);
+            if (0 == g_availableTopicCount) {
+                guard.release()->unlock();
+                SLEEP(1);
+                continue;
             }
-            if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
-                return;
-            }
-        }
 
-        ServiceRegistrationOptions serviceOptions;
-        serviceOptions.setGroupId(d_groupId.c_str(), d_groupId.size());
-        serviceOptions.setServicePriority(d_priority);
-        if (!session.registerService(d_service.c_str(), providerIdentity, serviceOptions)) {
-            std::cerr <<"Failed to register " << d_service << std::endl;
-            return;
-        }
-
-        Service service = session.getService(d_service.c_str());
-
-        // Now we will start publishing
-        int value=1;
-        while (g_running) {
-            Event event = service.createPublishEvent();
-            {
-                MutexGuard guard(&g_mutex);
-                if (0 == g_availableTopicCount) {
-                    guard.release()->unlock();
-                    SLEEP(1);
+            EventFormatter eventFormatter(event);
+            for (MyStreams::iterator iter = g_streams.begin();
+                iter != g_streams.end(); ++iter) {
+                if (!iter->second->isAvailable()) {
                     continue;
                 }
+                std::ostringstream os;
+                os << ++value;
 
-                EventFormatter eventFormatter(event);
-                for (MyStreams::iterator iter = g_streams.begin();
-                    iter != g_streams.end(); ++iter) {
-                    if (!iter->second->isAvailable()) {
-                        continue;
-                    }
-                    std::ostringstream os;
-                    os << ++value;
-
-                    if (!iter->second->isInitialPaintSent()) {
-                        eventFormatter.appendRecapMessage(
-                                                        iter->second->topic());
-                        eventFormatter.setElement("numRows", 25);
-                        eventFormatter.setElement("numCols", 80);
-                        eventFormatter.pushElement("rowUpdate");
-                        for (int i = 1; i < 6; ++i) {
-                            eventFormatter.appendElement();
-                            eventFormatter.setElement("rowNum", i);
-                            eventFormatter.pushElement("spanUpdate");
-                            eventFormatter.appendElement();
-                            eventFormatter.setElement("startCol", 1);
-                            eventFormatter.setElement("length", 10);
-                            eventFormatter.setElement("text", "INITIAL");
-                            eventFormatter.setElement("fgColor", "RED");
-                            eventFormatter.popElement();
-                            eventFormatter.popElement();
-                            eventFormatter.popElement();
-                        }
+                if (!iter->second->isInitialPaintSent()) {
+                    eventFormatter.appendRecapMessage(
+                                                    iter->second->topic());
+                    eventFormatter.setElement("numRows", 25);
+                    eventFormatter.setElement("numCols", 80);
+                    eventFormatter.pushElement("rowUpdate");
+                    for (int i = 1; i < 6; ++i) {
+                        eventFormatter.appendElement();
+                        eventFormatter.setElement("rowNum", i);
+                        eventFormatter.pushElement("spanUpdate");
+                        eventFormatter.appendElement();
+                        eventFormatter.setElement("startCol", 1);
+                        eventFormatter.setElement("length", 10);
+                        eventFormatter.setElement("text", "INITIAL");
+                        eventFormatter.setElement("fgColor", "RED");
                         eventFormatter.popElement();
-                        iter->second->setIsInitialPaintSent(true);
+                        eventFormatter.popElement();
+                        eventFormatter.popElement();
                     }
-
-                    eventFormatter.appendMessage("RowUpdate",
-                                                 iter->second->topic());
-                    eventFormatter.setElement("rowNum", 1);
-                    eventFormatter.pushElement("spanUpdate");
-                    eventFormatter.appendElement();
-                    Name START_COL("startCol");
-                    eventFormatter.setElement(START_COL, 1);
-                    eventFormatter.setElement("length", int(os.str().size()));
-                    eventFormatter.setElement("text", os.str().c_str());
                     eventFormatter.popElement();
-                    eventFormatter.popElement();
+                    iter->second->setIsInitialPaintSent(true);
                 }
-            }
 
-            printMessages(event);
-            session.publish(event);
-            SLEEP(10);
+                eventFormatter.appendMessage("RowUpdate",
+                                             iter->second->topic());
+                eventFormatter.setElement("rowNum", 1);
+                eventFormatter.pushElement("spanUpdate");
+                eventFormatter.appendElement();
+                Name START_COL("startCol");
+                eventFormatter.setElement(START_COL, 1);
+                eventFormatter.setElement("length", int(os.str().size()));
+                eventFormatter.setElement("text", os.str().c_str());
+                eventFormatter.popElement();
+                eventFormatter.popElement();
+            }
         }
-        session.stop();
+
+        printMessages(event);
+        session.publish(event);
+        SLEEP(10);
     }
-};
+    session.stop();
+}
 
 int main(int argc, char **argv)
 {

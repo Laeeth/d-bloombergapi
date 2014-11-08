@@ -17,44 +17,21 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include <blpapi_correlationid.h>
-#include <blpapi_defs.h>
-#include <blpapi_event.h>
-#include <blpapi_eventformatter.h>
-#include <blpapi_exception.h>
-#include <blpapi_identity.h>
-#include <blpapi_message.h>
-#include <blpapi_name.h>
-#include <blpapi_providersession.h>
-#include <blpapi_request.h>
-#include <blpapi_topiclist.h>
-#include <blpapi_service.h>
-#include <blpapi_topic.h>
+import std.container;
+import std.string;
+import std.stdio;
+import std.stdlib;
+import blpapi;
 
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <iostream>
-#include <iterator>
-#include <list>
-#include <map>
-#include <string>
-
-#include "BlpThreadUtil.h"
-
-using namespace BloombergLP;
-using namespace blpapi;
-
-namespace {
 Name TOKEN_SUCCESS("TokenGenerationSuccess");
 Name TOKEN_FAILURE("TokenGenerationFailure");
 Name AUTHORIZATION_SUCCESS("AuthorizationSuccess");
 Name TOKEN("token");
 Name SESSION_TERMINATED("SessionTerminated");
 
-const std::string AUTH_USER       = "AuthenticationType=OS_LOGON";
-const std::string AUTH_APP_PREFIX = "AuthenticationMode=APPLICATION_ONLY;ApplicationAuthenticationType=APPNAME_AND_KEY;ApplicationName=";
-const std::string AUTH_DIR_PREFIX = "AuthenticationType=DIRECTORY_SERVICE;DirSvcPropertyName=";
+const string AUTH_USER       = "AuthenticationType=OS_LOGON";
+const string AUTH_APP_PREFIX = "AuthenticationMode=APPLICATION_ONLY;ApplicationAuthenticationType=APPNAME_AND_KEY;ApplicationName=";
+const string AUTH_DIR_PREFIX = "AuthenticationType=DIRECTORY_SERVICE;DirSvcPropertyName=";
 const char* AUTH_OPTION_NONE      = "none";
 const char* AUTH_OPTION_USER      = "user";
 const char* AUTH_OPTION_APP       = "app=";
@@ -124,29 +101,29 @@ bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
 
 class ContributionsPageExample
 {
-    std::vector<std::string> d_hosts;
+    string[]  d_hosts;
     int                      d_port;
-    std::string              d_service;
-    std::string              d_topic;
-    std::string              d_authOptions;
+    string              d_service;
+    string              d_topic;
+    string              d_authOptions;
     int                      d_contributorId;
 
     void printUsage()
     {
-        std::cout
-            << "Publish on a topic. " << std::endl
-            << "Usage:" << std::endl
-            << "\t[-ip   <ipAddress>]    \tserver name or IP (default: localhost)" << std::endl
-            << "\t[-p    <tcpPort>]      \tserver port (default: 8194)" << std::endl
-            << "\t[-s    <service>]      \tservice name (default: //blp/mpfbapi)" << std::endl
-            << "\t[-t    <topic>]        \ttopic (default: 220/660/1)" << std::endl
-            << "\t[-c    <contributorId>]\tcontributor id (default: 8563)" << std::endl
-            << "\t[-auth <option>]       \tauthentication option: user|none|app=<app>|dir=<property> (default: user)" << std::endl;
+        writefln("Publish on a topic. \n"
+             "Usage:\n" 
+             "\t[-ip   <ipAddress>]    \tserver name or IP (default: localhost)\n" 
+             "\t[-p    <tcpPort>]      \tserver port (default: 8194)\n" 
+             "\t[-s    <service>]      \tservice name (default: //blp/mpfbapi)\n" 
+             "\t[-t    <topic>]        \ttopic (default: 220/660/1)\n" 
+             "\t[-c    <contributorId>]\tcontributor id (default: 8563)\n" 
+             "\t[-auth <option>]       \tauthentication option: user|none|app=<app>|dir=<property> (default: user)\n";
     }
 
-    bool parseCommandLine(int argc, char **argv)
+    bool parseCommandLine(string[] argv)
     {
-        for (int i = 1; i < argc; ++i) {
+        foreach(i;1..argv.length)
+        {
             if (!std::strcmp(argv[i], "-ip") && i + 1 < argc)
                 d_hosts.push_back(argv[++i]);
             else if (!std::strcmp(argv[i], "-p") &&  i + 1 < argc)
@@ -204,10 +181,7 @@ public:
     {
     }
 
-    bool authorize(const Service& authService,
-                   Identity *providerIdentity,
-                   ProviderSession *session,
-                   const CorrelationId& cid)
+    bool authorize(const Service& authService, Identity *providerIdentity, ProviderSession *session, const CorrelationId& cid)
     {
         {
             MutexGuard guard(&g_lock);
@@ -265,7 +239,7 @@ public:
         }
     }
 
-    void run(int argc, char **argv)
+    void run(string[] argv)
     {
         if (!parseCommandLine(argc, argv)) return;
 
@@ -278,15 +252,12 @@ public:
         sessionOptions.setAutoRestartOnDisconnection(true);
         sessionOptions.setNumStartAttempts(d_hosts.size());
 
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
-        std::copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << std::endl;
+        writefln("Connecting to port %s on %s", d_port, std::copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
 
         MyEventHandler myEventHandler;
         ProviderSession session(sessionOptions, &myEventHandler, 0);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
 
@@ -316,7 +287,8 @@ public:
 
         MyStreams myStreams;
 
-        for (size_t i = 0; i < topicList.size(); ++i) {
+        foreach(i;0..topicList.size())
+        {
             MyStream *stream = reinterpret_cast<MyStream*>(
                 topicList.correlationIdAt(i).asPointer());
             int resolutionStatus = topicList.statusAt(i);
@@ -326,12 +298,7 @@ public:
                 myStreams.push_back(stream);
             }
             else {
-                std::cout
-                    << "Stream '"
-                    << stream->getId()
-                    << "': topic not resolved, status = "
-                    << resolutionStatus
-                    << std::endl;
+                writefln("Stream '%s': topic not resolved, status=%s",stream->getId(),resolutionStatus);
             }
         }
 
@@ -421,14 +388,14 @@ public:
     }
 };
 
-int main(int argc, char **argv)
+int main(string[] argv)
 {
-    std::cout << "ContributionsPageExample" << std::endl;
+    writefln("ContributionsPageExample");
     ContributionsPageExample example;
     try {
         example.run(argc, argv);
     } catch (Exception &e) {
-        std::cerr << "Library Exception!!! " << e.description() << std::endl;
+        stderr.writefln("Library Exception!!! %s",e.description());
     }
     // wait for enter key to exit application
     std::cout << "Press ENTER to quit" << std::endl;
