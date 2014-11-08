@@ -1,3 +1,4 @@
+import std.bitmanip;
 /**
  Copyright 2012. Bloomberg Finance L.P.
  
@@ -26,72 +27,6 @@ Ported to D-lang by Laeeth Isharc (2014).  Do with this as you wish, but at your
 // One can be the master of a 1,000 line header file. It's tough to know what is going on in a 14,000 line file
 extern(C) 
 {
-
- void blpapi_UserHandle_release(blpapi_UserHandle_t *handle);
- int blpapi_UserHandle_addRef(blpapi_UserHandle_t *handle);
- int blpapi_UserHandle_hasEntitlements(const blpapi_UserHandle_t* handle, const blpapi_Service_t* service,
-    const blpapi_Element_t* eidElement,const int* entitlementIds, size_t numEntitlements, int* failedEntitlements, int* failedEntitlementsCount);
- int blpapi_AbstractSession_cancel(blpapi_AbstractSession_t* session, const blpapi_CorrelationId_t *correlationIds,
-    size_t numCorrelationIds, const char* requestLabel, int requestLabelLen);
- int blpapi_AbstractSession_sendAuthorizationRequest(blpapi_AbstractSession_t *session, const blpapi_Request_t* request,
-    blpapi_Identity_t* identity, blpapi_CorrelationId_t* correlationId, blpapi_EventQueue_t * eventQueue, const char* requestLabel, int requestLabelLen);
- int blpapi_AbstractSession_openService(blpapi_AbstractSession_t *session, const char* serviceIdentifier);
- int blpapi_AbstractSession_openServiceAsync(blpapi_AbstractSession_t *session, const char   *serviceIdentifier, blpapi_CorrelationId_t *correlationId);
- int blpapi_AbstractSession_generateToken(blpapi_AbstractSession_t *session, blpapi_CorrelationId_t *correlationId, blpapi_EventQueue_t *eventQueue);
- int blpapi_AbstractSession_getService(blpapi_AbstractSession_t *session, blpapi_Service_t  **service, const char   *serviceIdentifier);
- blpapi_Identity_t *blpapi_AbstractSession_createIdentity(blpapi_AbstractSession_t *session);
- void blpapi_Constant_setUserData(blpapi_Constant_t *constant, void * userdata);
- blpapi_Name_t* blpapi_Constant_name(const blpapi_Constant_t *constant);
- const char* blpapi_Constant_description(const blpapi_Constant_t *constant);
- int blpapi_Constant_status(const blpapi_Constant_t *constant);
- int blpapi_Constant_datatype(const blpapi_Constant_t *constant);
- int blpapi_Constant_getValueAsChar(const blpapi_Constant_t *constant, blpapi_Char_t *buffer);
- int blpapi_Constant_getValueAsInt32(const blpapi_Constant_t *constant, blpapi_Int32_t *buffer);
- int blpapi_Constant_getValueAsInt64(const blpapi_Constant_t *constant, blpapi_Int64_t *buffer);
- int blpapi_Constant_getValueAsFloat32(const blpapi_Constant_t *constant, blpapi_Float32_t *buffer);
- int blpapi_Constant_getValueAsFloat64(const blpapi_Constant_t *constant, blpapi_Float64_t *buffer);
- int blpapi_Constant_getValueAsDatetime(const blpapi_Constant_t *constant, blpapi_Datetime_t *buffer);
- int blpapi_Constant_getValueAsString(const blpapi_Constant_t *constant, const char **buffer);
- void * blpapi_Constant_userData(const blpapi_Constant_t *constant);
- void blpapi_ConstantList_setUserData(blpapi_ConstantList_t *constant, void * userdata);
- blpapi_Name_t* blpapi_ConstantList_name(const blpapi_ConstantList_t *list);
- const char* blpapi_ConstantList_description(const blpapi_ConstantList_t *list);
- int blpapi_ConstantList_numConstants(const blpapi_ConstantList_t *list);
- int blpapi_ConstantList_datatype(const blpapi_ConstantList_t *constant);
- int blpapi_ConstantList_status(const blpapi_ConstantList_t *list);
- blpapi_Constant_t* blpapi_ConstantList_getConstant(const blpapi_ConstantList_t *constant, const char *nameString, const blpapi_Name_t *name);
- blpapi_Constant_t* blpapi_ConstantList_getConstantAt(const blpapi_ConstantList_t *constant, size_t index);
- void * blpapi_ConstantList_userData(const blpapi_ConstantList_t *constant);
-
-struct blpapi_ManagedPtr_t_;
-blpapi_ManagedPtr_t_ blpapi_ManagedPtr_t;
-
-extern(C) alias blpapi_ManagedPtr_ManagerFunction_t=int function( blpapi_ManagedPtr_t *managedPtr, const blpapi_ManagedPtr_t *srcPtr, int operation);
-union {
-    int intValue;
-    void *ptr;
-} blpapi_ManagedPtr_t_data_;
-
-struct blpapi_ManagedPtr_t_ {
- void *pointer;
- blpapi_ManagedPtr_t_data_ userData[4];
- blpapi_ManagedPtr_ManagerFunction_t manager;
-};
-
-/* ????
-struct blpapi_CorrelationId_t_ {
- uint size:8;  // fill in the size of this struct
- uint valueType:4; // type of value held by this correlation id
- uint classId:16; // user defined classification id
- uint reserved:4; // for internal use must be 0
-
- union {
-  blpapi_UInt64_t intValue;
-  blpapi_ManagedPtr_t ptrValue;
- } value;
-};
-blpapi_CorrelationId_t_ blpapi_CorrelationId_t;
-*/
 struct blpapi_Datetime_tag {
  blpapi_UChar_t parts;  // bitmask of date/time parts that are set
  blpapi_UChar_t hours;
@@ -103,8 +38,55 @@ struct blpapi_Datetime_tag {
  blpapi_UInt16_t year;
  blpapi_Int16_t offset;  // (signed) minutes ahead of UTC
 };
+alias blpapi_Datetime_t=blpapi_Datetime_tag ;
+// Forward declarationss
+struct blpapi_EventFormatter;
+alias blpapi_EventFormatter_t = blpapi_EventFormatter;
+struct blpapi_Topic;
+alias blpapi_Topic_t= blpapi_Topic ;
+struct blpapi_Message;
+alias blpapi_Message_t=blpapi_Message ;
+struct blpapi_Request;
+alias blpapi_Request_t=blpapi_Request ;
+alias blpapi_TimePoint_t = blpapi_TimePoint ;
+struct blpapi_SubscriptionList;
+alias blpapi_SubscriptionList_t = blpapi_SubscriptionList ;
+struct blpapi_ServiceRegistrationOptions;
+alias blpapi_ServiceRegistrationOptions_t = blpapi_ServiceRegistrationOptions;
+// End Forward declarations
 
-blpapi_Datetime_tag blpapi_Datetime_t;
+alias blpapi_ManagedPtr_t =  blpapi_ManagedPtr_t_ ;
+extern (C) alias blpapi_ManagedPtr_ManagerFunction_t=int function(blpapi_ManagedPtr_t *managedPtr, const blpapi_ManagedPtr_t *srcPtr, int operation);
+
+union blpapi_ManagedPtr_t_data_u {
+    int   intValue;
+    void *ptr;
+}
+
+alias blpapi_ManagedPtr_t_data_ =  blpapi_ManagedPtr_t_data_u ;
+
+struct blpapi_ManagedPtr_t_ {
+ void *pointer;
+ blpapi_ManagedPtr_t_data_ userData[4];
+ blpapi_ManagedPtr_ManagerFunction_t manager;
+};
+
+struct blpapi_CorrelationId_t_ {
+    mixin(bitfields!(
+        uint, "size",    8,         // fill in the size of this struct
+        int,  "valueType",    4,    // type of value held by this correlation id
+        uint, "classId",    16,     // user defined classification id
+        uint, "reserved", 4));     // for internal use must be 0
+
+    union _value {
+        blpapi_UInt64_t      intValue;
+        blpapi_ManagedPtr_t  ptrValue;
+    };
+    _value value;
+}
+
+alias blpapi_CorrelationId_t=blpapi_CorrelationId_t_ ;
+
 
 struct blpapi_HighPrecisionDatetime_tag {
  blpapi_Datetime_t datetime;
@@ -114,15 +96,7 @@ struct blpapi_HighPrecisionDatetime_tag {
       // '1000000000LL * milliSeconds + picoSeconds'
 };
 
-blpapi_HighPrecisionDatetime_tag blpapi_HighPrecisionDatetime_t;
-
- int blpapi_Datetime_compare(blpapi_Datetime_t lhs, blpapi_Datetime_t rhs);
- int blpapi_Datetime_print(const blpapi_Datetime_t *datetime, blpapi_StreamWriter_t streamWriter, void *stream, int level,
-     int spacesPerLevel);
-
- int blpapi_HighPrecisionDatetime_compare(const blpapi_HighPrecisionDatetime_t *lhs, const blpapi_HighPrecisionDatetime_t *rhs);
- int blpapi_HighPrecisionDatetime_print(const blpapi_HighPrecisionDatetime_t *datetime, blpapi_StreamWriter_t    streamWriter, void      *stream, int       level, int       spacesPerLevel);
- int blpapi_HighPrecisionDatetime_fromTimePoint(blpapi_HighPrecisionDatetime_t *datetime, const blpapi_TimePoint_t  *timePoint, short     offset);
+extern(C) alias blpapi_HighPrecisionDatetime_t= blpapi_HighPrecisionDatetime_tag ;
 enum BLPAPI
 {
  CORRELATION_TYPE_UNSET =0,
@@ -143,10 +117,10 @@ enum BLPAPI
  DATETIME_SECONDS_PART =0x40,
  DATETIME_MILLISECONDS_PART =0x80,
  DATETIME_FRACSECONDS_PART =0x80,
- DATETIME_DATE_PART  =(BLPAPI_DATETIME_YEAR_PART|BLPAPI_DATETIME_MONTH_PART|BLPAPI_DATETIME_DAY_PART),
- DATETIME_TIME_PART  =(BLPAPI_DATETIME_HOURS_PART|BLPAPI_DATETIME_MINUTES_PART|BLPAPI_DATETIME_SECONDS_PART),
- DATETIME_TIMEMILLI_PART =(BLPAPI_DATETIME_TIME_PART|BLPAPI_DATETIME_MILLISECONDS_PART),
- DATETIME_TIMEFRACSECONDS_PART =(BLPAPI_DATETIME_TIME_PART|BLPAPI_DATETIME_FRACSECONDS_PART),
+ DATETIME_DATE_PART  =(BLPAPI.DATETIME_YEAR_PART|BLPAPI.DATETIME_MONTH_PART|BLPAPI.DATETIME_DAY_PART),
+ DATETIME_TIME_PART  =(BLPAPI.DATETIME_HOURS_PART|BLPAPI.DATETIME_MINUTES_PART|BLPAPI.DATETIME_SECONDS_PART),
+ DATETIME_TIMEMILLI_PART =(BLPAPI.DATETIME_TIME_PART|BLPAPI.DATETIME_MILLISECONDS_PART),
+ DATETIME_TIMEFRACSECONDS_PART =(BLPAPI.DATETIME_TIME_PART|BLPAPI.DATETIME_FRACSECONDS_PART),
 
 
  EVENTTYPE_ADMIN    =1,
@@ -193,8 +167,8 @@ enum BLPAPI
  SEATTYPE_NONBPS =1,
 
  SERVICEREGISTRATIONOPTIONS_PRIORITY_LOW =0,
- SERVICEREGISTRATIONOPTIONS_PRIORITY_MEDIUM= INT_MAX/2,
- SERVICEREGISTRATIONOPTIONS_PRIORITY_HIGH =INT_MAX,
+ SERVICEREGISTRATIONOPTIONS_PRIORITY_MEDIUM= int.max/2,
+ SERVICEREGISTRATIONOPTIONS_PRIORITY_HIGH =int.max,
 
  REGISTRATIONPARTS_DEFAULT =0x1,
  REGISTRATIONPARTS_PUBLISHING =0x2,
@@ -205,27 +179,82 @@ enum BLPAPI
  VERSION_MINOR=8,
  VERSION_PATCH=5,
  VERSION_BUILD=1,
-}
- int blpapi_DiagnosticsUtil_memoryInfo(char *buffer, size_t bufferLength);
 
-// Forward declarations
-struct blpapi_EventFormatter;
-blpapi_EventFormatter blpapi_EventFormat_t;
-struct blpapi_Topic;
-blpapi_Topic blpapi_Topic_t;
-struct blpapi_Message;
-blpapi_Message blpapi_Message_t;
-struct blpapi_Request;
-blpapi_Request blpapi_Request_t;
-struct blpapi_HighPrecisionDatetime_tag;
-blpapi_HighPrecisionDatetime_tag blpapi_HighPrecisionDatetime_t;
-struct blpapi_TimePoint;
-blpapi_TimePoint blpapi_TimePoint_t;
-struct blpapi_SubscriptionList;
-blpapi_SubscriptionList blpapi_SubscriptionList_t;
-struct blpapi_ServiceRegistrationOptions;
-blpapi_ServiceRegistrationOptions blpapi_ServiceRegistrationOptions_t;
-// End Forward declarations
+ UNKNOWN_CLASS   =0x00000,
+ INVALIDSTATE_CLASS   =0x10000 ,
+ INVALIDARG_CLASS   =0x20000 ,
+ IOERROR_CLASS   =0x30000 ,
+ CNVERROR_CLASS   =0x40000 ,
+ BOUNDSERROR_CLASS  =0x50000 ,
+ NOTFOUND_CLASS   =0x60000 ,
+ FLDNOTFOUND_CLASS  =0x70000 ,
+ UNSUPPORTED_CLASS  =0x80000 ,
+
+ ERROR_UNKNOWN    =(BLPAPI.UNKNOWN_CLASS | 1) ,
+ ERROR_ILLEGAL_ARG   =(BLPAPI.INVALIDARG_CLASS | 2) ,
+ ERROR_ILLEGAL_ACCESS  =(BLPAPI.UNKNOWN_CLASS | 3) ,
+ ERROR_INVALID_SESSION  =(BLPAPI.INVALIDARG_CLASS | 4) ,
+ ERROR_DUPLICATE_CORRELATIONID =(BLPAPI.INVALIDARG_CLASS | 5) ,
+ ERROR_INTERNAL_ERROR  =(BLPAPI.UNKNOWN_CLASS | 6) ,
+ ERROR_RESOLVE_FAILED  =(BLPAPI.IOERROR_CLASS | 7) ,
+ ERROR_CONNECT_FAILED  =(BLPAPI.IOERROR_CLASS | 8) ,
+ ERROR_ILLEGAL_STATE   =(BLPAPI.INVALIDSTATE_CLASS| 9) ,
+ ERROR_CODEC_FAILURE   =(BLPAPI.UNKNOWN_CLASS | 10) ,
+ ERROR_INDEX_OUT_OF_RANGE =(BLPAPI.BOUNDSERROR_CLASS | 11) ,
+ ERROR_INVALID_CONVERSION =(BLPAPI.CNVERROR_CLASS | 12) ,
+ ERROR_ITEM_NOT_FOUND  =(BLPAPI.NOTFOUND_CLASS | 13) ,
+ ERROR_IO_ERROR   =(BLPAPI.IOERROR_CLASS | 14) ,
+ ERROR_CORRELATION_NOT_FOUND =(BLPAPI.NOTFOUND_CLASS | 15) ,
+ ERROR_SERVICE_NOT_FOUND  =(BLPAPI.NOTFOUND_CLASS | 16) ,
+ ERROR_LOGON_LOOKUP_FAILED  =(BLPAPI.UNKNOWN_CLASS | 17) ,
+ ERROR_DS_LOOKUP_FAILED  =(BLPAPI.UNKNOWN_CLASS | 18) ,
+ ERROR_UNSUPPORTED_OPERATION =(BLPAPI.UNSUPPORTED_CLASS | 19) ,
+ ERROR_DS_PROPERTY_NOT_FOUND =(BLPAPI.NOTFOUND_CLASS | 20) ,
+}
+
+
+
+void blpapi_UserHandle_release(blpapi_UserHandle_t *handle);
+int blpapi_UserHandle_addRef(blpapi_UserHandle_t *handle);
+int blpapi_UserHandle_hasEntitlements(const blpapi_UserHandle_t* handle, const blpapi_Service_t* service, const blpapi_Element_t* eidElement,const int* entitlementIds, size_t numEntitlements, int* failedEntitlements, int* failedEntitlementsCount);
+int blpapi_AbstractSession_cancel(blpapi_AbstractSession_t* session, const blpapi_CorrelationId_t *correlationIds, size_t numCorrelationIds, const char* requestLabel, int requestLabelLen);
+int blpapi_AbstractSession_sendAuthorizationRequest(blpapi_AbstractSession_t *session, const blpapi_Request_t* request, blpapi_Identity_t* identity, blpapi_CorrelationId_t* correlationId, blpapi_EventQueue_t * eventQueue, const char* requestLabel, int requestLabelLen);
+int blpapi_AbstractSession_openService(blpapi_AbstractSession_t *session, const char* serviceIdentifier);
+int blpapi_AbstractSession_openServiceAsync(blpapi_AbstractSession_t *session, const char   *serviceIdentifier, blpapi_CorrelationId_t *correlationId);
+int blpapi_AbstractSession_generateToken(blpapi_AbstractSession_t *session, blpapi_CorrelationId_t *correlationId, blpapi_EventQueue_t *eventQueue);
+int blpapi_AbstractSession_getService(blpapi_AbstractSession_t *session, blpapi_Service_t  **service, const char   *serviceIdentifier);
+blpapi_Identity_t *blpapi_AbstractSession_createIdentity(blpapi_AbstractSession_t *session);
+void blpapi_Constant_setUserData(blpapi_Constant_t *constant, void * userdata);
+blpapi_Name_t* blpapi_Constant_name(const blpapi_Constant_t *constant);
+char* blpapi_Constant_description(const blpapi_Constant_t *constant);
+int blpapi_Constant_status(const blpapi_Constant_t *constant);
+int blpapi_Constant_datatype(const blpapi_Constant_t *constant);
+int blpapi_Constant_getValueAsChar(const blpapi_Constant_t *constant, blpapi_Char_t *buffer);
+int blpapi_Constant_getValueAsInt32(const blpapi_Constant_t *constant, blpapi_Int32_t *buffer);
+int blpapi_Constant_getValueAsInt64(const blpapi_Constant_t *constant, blpapi_Int64_t *buffer);
+int blpapi_Constant_getValueAsFloat32(const blpapi_Constant_t *constant, blpapi_Float32_t *buffer);
+int blpapi_Constant_getValueAsFloat64(const blpapi_Constant_t *constant, blpapi_Float64_t *buffer);
+int blpapi_Constant_getValueAsDatetime(const blpapi_Constant_t *constant, blpapi_Datetime_t *buffer);
+int blpapi_Constant_getValueAsString(const blpapi_Constant_t *constant, const char **buffer);
+void * blpapi_Constant_userData(const blpapi_Constant_t *constant);
+void blpapi_ConstantList_setUserData(blpapi_ConstantList_t *constant, void * userdata);
+blpapi_Name_t* blpapi_ConstantList_name(const blpapi_ConstantList_t *list);
+char* blpapi_ConstantList_description(const blpapi_ConstantList_t *list);
+int blpapi_ConstantList_numConstants(const blpapi_ConstantList_t *list);
+int blpapi_ConstantList_datatype(const blpapi_ConstantList_t *constant);
+int blpapi_ConstantList_status(const blpapi_ConstantList_t *list);
+blpapi_Constant_t* blpapi_ConstantList_getConstant(const blpapi_ConstantList_t *constant, const char *nameString, const blpapi_Name_t *name);
+blpapi_Constant_t* blpapi_ConstantList_getConstantAt(const blpapi_ConstantList_t *constant, size_t index);
+void * blpapi_ConstantList_userData(const blpapi_ConstantList_t *constant);
+int blpapi_Datetime_compare(blpapi_Datetime_t lhs, blpapi_Datetime_t rhs);
+int blpapi_Datetime_print(const blpapi_Datetime_t *datetime, blpapi_StreamWriter_t streamWriter, void *stream, int level, int spacesPerLevel);
+int blpapi_HighPrecisionDatetime_compare(const blpapi_HighPrecisionDatetime_t *lhs, const blpapi_HighPrecisionDatetime_t *rhs);
+int blpapi_HighPrecisionDatetime_print(const blpapi_HighPrecisionDatetime_t *datetime, blpapi_StreamWriter_t    streamWriter, void      *stream, int       level, int       spacesPerLevel);
+int blpapi_HighPrecisionDatetime_fromTimePoint(blpapi_HighPrecisionDatetime_t *datetime, const blpapi_TimePoint_t  *timePoint, short     offset);
+
+
+int blpapi_DiagnosticsUtil_memoryInfo(char *buffer, size_t bufferLength);
+
 
 // Function dispatch table declaration
 struct blpapi_FunctionEntries {
@@ -273,12 +302,16 @@ struct blpapi_FunctionEntries {
  extern (C) alias blpapi_TimePointUtil_nanosecondsBetween=long function(const blpapi_TimePoint_t *start, const blpapi_TimePoint_t *end);
  extern (C) alias blpapi_HighResolutionClock_now=int function (blpapi_TimePoint_t *timePoint);
  extern (C) alias blpapi_HighPrecisionDatetime_fromTimePoint=int function(blpapi_HighPrecisionDatetime_t *datetime, const blpapi_TimePoint_t *timePoint, short offset);
-} blpapi_FunctionEntries_t;
+}
+
+ blpapi_FunctionEntries blpapi_FunctionEntries_t;
+extern (C) alias blpapi_SchemaElementDefinition_t =void*;
+extern (C) alias blpapi_SchemaTypeDefinition_t=void*;
 
  extern size_t    g_blpapiFunctionTableSize;
- extern blpapi_FunctionEntries_t g_blpapiFunctionEntries;
+ alias g_blpapiFunctionEntries= blpapi_FunctionEntries_t ;
  blpapi_Name_t* blpapi_Element_name(const blpapi_Element_t *element);
- const char* blpapi_Element_nameString(const blpapi_Element_t *element);
+ char* blpapi_Element_nameString(const blpapi_Element_t *element);
  blpapi_SchemaElementDefinition_t* blpapi_Element_definition(const blpapi_Element_t* element);
  int blpapi_Element_datatype (const blpapi_Element_t* element);
  int blpapi_Element_isComplexType(const blpapi_Element_t* element);
@@ -330,57 +363,24 @@ struct blpapi_FunctionEntries {
  int blpapi_Element_appendElement (blpapi_Element_t *element, blpapi_Element_t **appendedElement);
  int blpapi_Element_setChoice (blpapi_Element_t *element, blpapi_Element_t **resultElement, const char* nameCstr, const blpapi_Name_t* name, size_t index);
 
-auto BLPAPI_RESULTCODE(auto res)
+ulong BLPAPI_RESULTCODE(ulong res)
 {
  return ((res) & 0xffff);
 }
-auto BLPAPI_RESULTCLASS(auto res)
+ulong BLPAPI_RESULTCLASS(ulong res)
 {
  return((res) & 0xff0000);
 }
 
-enum BLPAPI
-{
- UNKNOWN_CLASS   =0x00000,
- INVALIDSTATE_CLASS   =0x10000 ,
- INVALIDARG_CLASS   =0x20000 ,
- IOERROR_CLASS   =0x30000 ,
- CNVERROR_CLASS   =0x40000 ,
- BOUNDSERROR_CLASS  =0x50000 ,
- NOTFOUND_CLASS   =0x60000 ,
- FLDNOTFOUND_CLASS  =0x70000 ,
- UNSUPPORTED_CLASS  =0x80000 ,
 
- ERROR_UNKNOWN    =(BLPAPI_UNKNOWN_CLASS | 1) ,
- ERROR_ILLEGAL_ARG   =(BLPAPI_INVALIDARG_CLASS | 2) ,
- ERROR_ILLEGAL_ACCESS  =(BLPAPI_UNKNOWN_CLASS | 3) ,
- ERROR_INVALID_SESSION  =(BLPAPI_INVALIDARG_CLASS | 4) ,
- ERROR_DUPLICATE_CORRELATIONID =(BLPAPI_INVALIDARG_CLASS | 5) ,
- ERROR_INTERNAL_ERROR  =(BLPAPI_UNKNOWN_CLASS | 6) ,
- ERROR_RESOLVE_FAILED  =(BLPAPI_IOERROR_CLASS | 7) ,
- ERROR_CONNECT_FAILED  =(BLPAPI_IOERROR_CLASS | 8) ,
- ERROR_ILLEGAL_STATE   =(BLPAPI_INVALIDSTATE_CLASS| 9) ,
- ERROR_CODEC_FAILURE   =(BLPAPI_UNKNOWN_CLASS | 10) ,
- ERROR_INDEX_OUT_OF_RANGE =(BLPAPI_BOUNDSERROR_CLASS | 11) ,
- ERROR_INVALID_CONVERSION =(BLPAPI_CNVERROR_CLASS | 12) ,
- ERROR_ITEM_NOT_FOUND  =(BLPAPI_NOTFOUND_CLASS | 13) ,
- ERROR_IO_ERROR   =(BLPAPI_IOERROR_CLASS | 14) ,
- ERROR_CORRELATION_NOT_FOUND =(BLPAPI_NOTFOUND_CLASS | 15) ,
- ERROR_SERVICE_NOT_FOUND  =(BLPAPI_NOTFOUND_CLASS | 16) ,
- ERROR_LOGON_LOOKUP_FAILED  =(BLPAPI_UNKNOWN_CLASS | 17) ,
- ERROR_DS_LOOKUP_FAILED  =(BLPAPI_UNKNOWN_CLASS | 18) ,
- ERROR_UNSUPPORTED_OPERATION =(BLPAPI_UNSUPPORTED_CLASS | 19) ,
- ERROR_DS_PROPERTY_NOT_FOUND =(BLPAPI_NOTFOUND_CLASS | 20) ,
-}
-
- const char* blpapi_getLastErrorDescription(int resultCode);
+ char* blpapi_getLastErrorDescription(int resultCode);
 
 } // extern (C)
 
  int blpapi_Event_eventType(const blpapi_Event_t *event);
  int blpapi_Event_addRef(const blpapi_Event_t *event);
  int blpapi_Event_release(const blpapi_Event_t *event);
- blpapi_EventQueue_t* blpapi_EventQueue_create(void);
+ blpapi_EventQueue_t* blpapi_EventQueue_create();
  int blpapi_EventQueue_destroy(blpapi_EventQueue_t* eventQueue);
  blpapi_Event_t* blpapi_EventQueue_nextEvent(blpapi_EventQueue_t *eventQueue, int timeout);
  int blpapi_EventQueue_purge(blpapi_EventQueue_t *eventQueue);
@@ -427,17 +427,17 @@ struct blpapi_ErrorInfo {
  char description[256];
 };
 
-blpapi_ErrorInfo blpapi_ErrorInfo_t;
+alias blpapi_ErrorInfo_t=blpapi_ErrorInfo ;
 
  int blpapi_getErrorInfo(blpapi_ErrorInfo_t *buffer, int errorCode);
  blpapi_Name_t* blpapi_Message_messageType(const blpapi_Message_t *message);
- const char* blpapi_Message_typeString(const blpapi_Message_t *message);
- const char* blpapi_Message_topicName(const blpapi_Message_t *message);
+ char* blpapi_Message_typeString(const blpapi_Message_t *message);
+ char* blpapi_Message_topicName(const blpapi_Message_t *message);
  blpapi_Service_t* blpapi_Message_service(const blpapi_Message_t *message);
  int blpapi_Message_numCorrelationIds(const blpapi_Message_t *message);
  blpapi_CorrelationId_t blpapi_Message_correlationId(const blpapi_Message_t *message, size_t index);
  blpapi_Element_t* blpapi_Message_elements(const blpapi_Message_t *message);
- const char *blpapi_Message_privateData(const blpapi_Message_t *message, size_t *size); 
+ char *blpapi_Message_privateData(const blpapi_Message_t *message, size_t *size); 
  int blpapi_Message_fragmentType(const blpapi_Message_t *message);
  int blpapi_Message_addRef(const blpapi_Message_t *message); 
  int blpapi_Message_release(const blpapi_Message_t *message);
@@ -446,11 +446,9 @@ blpapi_ErrorInfo blpapi_ErrorInfo_t;
  void blpapi_Name_destroy(blpapi_Name_t *name);
  blpapi_Name_t* blpapi_Name_duplicate(const blpapi_Name_t *src);
  int blpapi_Name_equalsStr(const blpapi_Name_t *name, const char *string);
- const char* blpapi_Name_string(const blpapi_Name_t *name);
+ char* blpapi_Name_string(const blpapi_Name_t *name);
  size_t blpapi_Name_length(const blpapi_Name_t *name);
  blpapi_Name_t* blpapi_Name_findName(const char* nameString); 
-struct blpapi_ServiceRegistrationOptions;
-blpapi_ServiceRegistrationOptions blpapi_ServiceRegistrationOptions_t;
 extern (C) alias blpapi_ProviderEventHandler_t=void function(blpapi_Event_t* event, blpapi_ProviderSession_t* session, void* userData);
 blpapi_ProviderSession_t *blpapi_ProviderSession_create(blpapi_SessionOptions_t *parameters, blpapi_ProviderEventHandler_t handler, blpapi_EventDispatcher_t *dispatcher, void *userData);
  void blpapi_ProviderSession_destroy(blpapi_ProviderSession_t *session);
@@ -476,7 +474,7 @@ blpapi_ProviderSession_t *blpapi_ProviderSession_create(blpapi_SessionOptions_t 
  int blpapi_ProviderSession_publish(blpapi_ProviderSession_t *session, blpapi_Event_t *event);
  int blpapi_ProviderSession_sendResponse(blpapi_ProviderSession_t *session, blpapi_Event_t *event, int isPartialResponse);
  blpapi_AbstractSession_t *blpapi_ProviderSession_getAbstractSession(blpapi_ProviderSession_t *session);
- blpapi_ServiceRegistrationOptions_t* blpapi_ServiceRegistrationOptions_create(void);
+ blpapi_ServiceRegistrationOptions_t* blpapi_ServiceRegistrationOptions_create();
  blpapi_ServiceRegistrationOptions_t* blpapi_ServiceRegistrationOptions_duplicate(const blpapi_ServiceRegistrationOptions_t *parameters);
  void blpapi_ServiceRegistrationOptions_destroy(blpapi_ServiceRegistrationOptions_t *parameters);
  void blpapi_ServiceRegistrationOptions_copy(blpapi_ServiceRegistrationOptions_t *lhs, const blpapi_ServiceRegistrationOptions_t *rhs);
@@ -488,10 +486,8 @@ blpapi_ProviderSession_t *blpapi_ProviderSession_create(blpapi_SessionOptions_t 
  int blpapi_ServiceRegistrationOptions_getGroupId(blpapi_ServiceRegistrationOptions_t *parameters, char *groupdIdBuffer, int *groupIdLength);
  int blpapi_ServiceRegistrationOptions_getServicePriority(blpapi_ServiceRegistrationOptions_t *parameters);
  int blpapi_ServiceRegistrationOptions_getPartsToRegister(blpapi_ServiceRegistrationOptions_t *parameters);
-struct blpapi_Request;
-blpapi_Request blpapi_Request_t;
 struct blpapi_ResolutionList;
-blpapi_ResolutionList blpapi_ResolutionList_t;
+alias blpapi_ResolutionList_t=blpapi_ResolutionList ;
  blpapi_Element_t* blpapi_ResolutionList_extractAttributeFromResolutionSuccess(const blpapi_Message_t* message, const blpapi_Name_t* attribute);
  blpapi_ResolutionList_t* blpapi_ResolutionList_create(blpapi_ResolutionList_t* from);
  void blpapi_ResolutionList_destroy(blpapi_ResolutionList_t *list);
@@ -509,7 +505,7 @@ blpapi_ResolutionList blpapi_ResolutionList_t;
  int blpapi_ResolutionList_messageAt(const blpapi_ResolutionList_t* list, blpapi_Message_t** element, size_t index);
  int blpapi_ResolutionList_size(const blpapi_ResolutionList_t* list);
  blpapi_Name_t *blpapi_SchemaElementDefinition_name(const blpapi_SchemaElementDefinition_t *field);
- const char *blpapi_SchemaElementDefinition_description(const blpapi_SchemaElementDefinition_t *field);
+ char *blpapi_SchemaElementDefinition_description(const blpapi_SchemaElementDefinition_t *field);
  int blpapi_SchemaElementDefinition_status(const blpapi_SchemaElementDefinition_t *field);
  blpapi_SchemaTypeDefinition_t *blpapi_SchemaElementDefinition_type(const blpapi_SchemaElementDefinition_t *field);
  size_t blpapi_SchemaElementDefinition_numAlternateNames(const blpapi_SchemaElementDefinition_t *field);
@@ -520,7 +516,7 @@ blpapi_ResolutionList blpapi_ResolutionList_t;
  void blpapi_SchemaElementDefinition_setUserData(blpapi_SchemaElementDefinition_t *field, void *userdata);
  void *blpapi_SchemaElementDefinition_userData(const blpapi_SchemaElementDefinition_t *field);
  blpapi_Name_t *blpapi_SchemaTypeDefinition_name(const blpapi_SchemaTypeDefinition_t *type);
- const char *blpapi_SchemaTypeDefinition_description(const blpapi_SchemaTypeDefinition_t *type);
+ char *blpapi_SchemaTypeDefinition_description(const blpapi_SchemaTypeDefinition_t *type);
  int blpapi_SchemaTypeDefinition_status(const blpapi_SchemaTypeDefinition_t *type);
  int blpapi_SchemaTypeDefinition_datatype(const blpapi_SchemaTypeDefinition_t *type);
  int blpapi_SchemaTypeDefinition_isComplexType(const blpapi_SchemaTypeDefinition_t *type);
@@ -536,18 +532,18 @@ blpapi_ResolutionList blpapi_ResolutionList_t;
  void blpapi_SchemaTypeDefinition_setUserData(blpapi_SchemaTypeDefinition_t *element, void *userdata);
  void *blpapi_SchemaTypeDefinition_userData(const blpapi_SchemaTypeDefinition_t *element);
  blpapi_ConstantList_t* blpapi_SchemaTypeDefinition_enumeration(const blpapi_SchemaTypeDefinition_t *element);
- const char* blpapi_Operation_name(blpapi_Operation_t *service);
- const char* blpapi_Operation_description(blpapi_Operation_t *service);
+ char* blpapi_Operation_name(blpapi_Operation_t *service);
+ char* blpapi_Operation_description(blpapi_Operation_t *service);
  int blpapi_Operation_requestDefinition(blpapi_Operation_t *service, blpapi_SchemaElementDefinition_t **requestDefinition);
  int blpapi_Operation_numResponseDefinitions(blpapi_Operation_t *service);
  int blpapi_Operation_responseDefinition(blpapi_Operation_t *service, blpapi_SchemaElementDefinition_t **responseDefinition, size_t index);
- const char* blpapi_Service_name(blpapi_Service_t *service);
- const char* blpapi_Service_description(blpapi_Service_t *service);
+ char* blpapi_Service_name(blpapi_Service_t *service);
+ char* blpapi_Service_description(blpapi_Service_t *service);
  int blpapi_Service_numOperations(blpapi_Service_t *service);
  int blpapi_Service_numEventDefinitions(blpapi_Service_t *service); 
  int blpapi_Service_addRef(blpapi_Service_t *service);
  void blpapi_Service_release(blpapi_Service_t *service);
- const char* blpapi_Service_authorizationServiceName(blpapi_Service_t *service);
+ char* blpapi_Service_authorizationServiceName(blpapi_Service_t *service);
  int blpapi_Service_getOperation(blpapi_Service_t *service, blpapi_Operation_t **operation, const char* nameString, const blpapi_Name_t *name);
  int blpapi_Service_getOperationAt(blpapi_Service_t *service, blpapi_Operation_t **operation, size_t index);
  int blpapi_Service_getEventDefinition(blpapi_Service_t *service, blpapi_SchemaElementDefinition_t **result, const char* nameString, const blpapi_Name_t *name);
@@ -558,8 +554,8 @@ blpapi_ResolutionList blpapi_ResolutionList_t;
  int blpapi_Service_createAdminEvent(blpapi_Service_t* service, blpapi_Event_t** event);
  int blpapi_Service_createResponseEvent(blpapi_Service_t* service, const blpapi_CorrelationId_t* correlationId, blpapi_Event_t** event);
  int blpapi_Service_print(const blpapi_Service_t* service, blpapi_StreamWriter_t streamWriter, void *stream, int level, int spacesPerLevel);
- blpapi_SessionOptions_t *blpapi_SessionOptions_create(void);
-BLPAPI_EXPORTblpapi_SessionOptions_t *blpapi_SessionOptions_duplicate(const blpapi_SessionOptions_t *parameters);
+ blpapi_SessionOptions_t *blpapi_SessionOptions_create();
+ blpapi_SessionOptions_t *blpapi_SessionOptions_duplicate(const blpapi_SessionOptions_t *parameters);
  void blpapi_SessionOptions_copy(blpapi_SessionOptions_t  *lhs, const blpapi_SessionOptions_t *rhs);
  void blpapi_SessionOptions_destroy(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_setServerHost(blpapi_SessionOptions_t *parameters, const char   *serverHost);
@@ -584,20 +580,20 @@ BLPAPI_EXPORTblpapi_SessionOptions_t *blpapi_SessionOptions_duplicate(const blpa
  int blpapi_SessionOptions_setDefaultKeepAliveResponseTimeout(blpapi_SessionOptions_t *parameters, int    timeoutMsecs);
  int blpapi_SessionOptions_setKeepAliveEnabled(blpapi_SessionOptions_t *parameters, int    isEnabled);
  void blpapi_SessionOptions_setRecordSubscriptionDataReceiveTimes(blpapi_SessionOptions_t *parameters, int    shouldRecord);
- const char *blpapi_SessionOptions_serverHost(blpapi_SessionOptions_t *parameters);
+  char *blpapi_SessionOptions_serverHost(blpapi_SessionOptions_t *parameters);
  uint blpapi_SessionOptions_serverPort(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_numServerAddresses(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_getServerAddress(blpapi_SessionOptions_t *parameters, const char   **serverHost, ushort   *serverPort, size_t    index);
  uint blpapi_SessionOptions_connectTimeout(blpapi_SessionOptions_t *parameters);
- const char *blpapi_SessionOptions_defaultServices(blpapi_SessionOptions_t *parameters);
- const char *blpapi_SessionOptions_defaultSubscriptionService(blpapi_SessionOptions_t *parameters);
- const char *blpapi_SessionOptions_defaultTopicPrefix(blpapi_SessionOptions_t *parameters);
+ char *blpapi_SessionOptions_defaultServices(blpapi_SessionOptions_t *parameters);
+ char *blpapi_SessionOptions_defaultSubscriptionService(blpapi_SessionOptions_t *parameters);
+ char *blpapi_SessionOptions_defaultTopicPrefix(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_allowMultipleCorrelatorsPerMsg(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_clientMode(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_maxPendingRequests(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_autoRestartOnDisconnection(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_autoRestart(blpapi_SessionOptions_t *parameters);
- const char *blpapi_SessionOptions_authenticationOptions(blpapi_SessionOptions_t *parameters);
+ char *blpapi_SessionOptions_authenticationOptions(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_numStartAttempts(blpapi_SessionOptions_t *parameters);
  size_t blpapi_SessionOptions_maxEventQueueSize(blpapi_SessionOptions_t *parameters);
  float blpapi_SessionOptions_slowConsumerWarningHiWaterMark(blpapi_SessionOptions_t *parameters);
@@ -605,11 +601,9 @@ BLPAPI_EXPORTblpapi_SessionOptions_t *blpapi_SessionOptions_duplicate(const blpa
  int blpapi_SessionOptions_defaultKeepAliveInactivityTime(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_defaultKeepAliveResponseTimeout(blpapi_SessionOptions_t *parameters);
  int blpapi_SessionOptions_keepAliveEnabled(blpapi_SessionOptions_t *parameters);
- int blpapi_SessionOptions_recordSubscriptionDataReceiveTimes(blpapi_SessionOptions_t *parameters);
-blpapi_StreamWriter_t=int function(const char* data, int length, void *stream);
-struct blpapi_SubscriptionList;
-blpapi_SubscriptionList blpapi_SubscriptionList_t;
- blpapi_SubscriptionList_t *blpapi_SubscriptionList_create(void);
+int blpapi_SessionOptions_recordSubscriptionDataReceiveTimes(blpapi_SessionOptions_t *parameters);
+extern (C) alias blpapi_StreamWriter_t=int function(const char* data, int length, void *stream);
+ blpapi_SubscriptionList_t *blpapi_SubscriptionList_create();
  void blpapi_SubscriptionList_destroy(blpapi_SubscriptionList_t *list);
  int blpapi_SubscriptionList_add(blpapi_SubscriptionList_t  *list, const char    *subscriptionString, const blpapi_CorrelationId_t *correlationId, const char    **fields, const char    **options, size_t     numfields, size_t     numOptions);
  int blpapi_SubscriptionList_addResolved(blpapi_SubscriptionList_t *list, const char    *subscriptionString, const blpapi_CorrelationId_t *correlationId);
@@ -623,16 +617,13 @@ blpapi_SubscriptionList blpapi_SubscriptionList_t;
 struct blpapi_TimePoint {
  blpapi_Int64_t d_value;
 }
-blpapi_TimePoint blpapi_TimePoint_t;
-struct blpapi_Topic;
-blpapi_Topic blpapi_Topic_t;
  blpapi_Topic_t* blpapi_Topic_create(blpapi_Topic_t* from);
  void blpapi_Topic_destroy(blpapi_Topic_t* victim);
  int blpapi_Topic_compare(const blpapi_Topic_t* lhs, const blpapi_Topic_t* rhs);
  blpapi_Service_t* blpapi_Topic_service(const blpapi_Topic_t *topic);
  int blpapi_Topic_isActive(const blpapi_Topic_t *topic);
 struct blpapi_TopicList;
-blpapi_TopicList blpapi_TopicList_t;
+alias blpapi_TopicList_t = blpapi_TopicList;
  blpapi_TopicList_t* blpapi_TopicList_create(blpapi_TopicList_t* from);
  void blpapi_TopicList_destroy(blpapi_TopicList_t *list);
  int blpapi_TopicList_add(blpapi_TopicList_t* list, const char* topic, const blpapi_CorrelationId_t *correlationId);
@@ -646,15 +637,15 @@ blpapi_TopicList blpapi_TopicList_t;
  int blpapi_TopicList_messageAt(const blpapi_TopicList_t* list, blpapi_Message_t** element, size_t index);
  int blpapi_TopicList_size(const blpapi_TopicList_t* list);
 alias blpapi_Bool_t = int;
-alias blpapi_Char_t=char;
-alias blpapi_UChar_t=uchar;
+alias blpapi_Char_t=byte;
+alias blpapi_UChar_t=ubyte;
 alias blpapi_Int16_t=short;
-alias blpapi_UInt16_t=ushort
+alias blpapi_UInt16_t=ushort;
 alias blpapi_Int32_t =int; 
 alias blpapi_UInt32_t=uint;
 alias blpapi_Int64_t = long;
 alias blpapi_UInt64_t = ulong;
-alias blpapi_Float32_t=floar;
+alias blpapi_Float32_t=float;
 alias blpapi_Float64_t =double;
 
 enum blpapi_DataType
@@ -678,7 +669,7 @@ enum blpapi_DataType
   CORRELATION_ID = 17, // Used for some internal messages
 };
 
-enum blpapi_Logging_Severity
+enum blpapi_Logging_Severity_t
 {
  OFF = 0,
  FATAL = 1,
@@ -690,62 +681,57 @@ enum blpapi_Logging_Severity
 }
 
 struct blpapi_AbstractSession;
-blpapi_AbstractSession blpapi_AbstractSession_t;
+alias blpapi_AbstractSession_t= blpapi_AbstractSession ;
 
 struct blpapi_Constant;
-blpapi_Constant blpapi_Constant_t;
+alias blpapi_Constant_t=blpapi_Constant ;
 
 struct blpapi_ConstantList;
-blpapi_ConstantList blpapi_ConstantList_t;
+alias blpapi_ConstantList_t=blpapi_ConstantList ;
 
 struct blpapi_Element;
-blpapi_Element blpapi_Element_t;
+alias blpapi_Element_t=blpapi_Element ;
 
 struct blpapi_Event;
-blpapi_Event blpapi_Event_t;
+alias blpapi_Event_t=blpapi_Event ;
 
 struct blpapi_EventDispatcher;
-blpapi_EventDispatcher blpapi_EventDispatcher_t;
-
-struct blpapi_EventFormatter;
-blpapi_EventFormatter blpapi_EventFormatter_t;
+alias blpapi_EventDispatcher_t=blpapi_EventDispatcher ;
 
 struct blpapi_EventQueue;
-blpapi_EventQueue blpapi_EventQueue_t;
+alias blpapi_EventQueue_t=blpapi_EventQueue;
 
 struct blpapi_MessageIterator;
-blpapi_MessageIterator blpapi_MessageIterator_t;
+alias blpapi_MessageIterator_t=blpapi_MessageIterator ;
 
 struct blpapi_Name;
-blpapi_Name blpapi_Name_t;
+alias blpapi_Name_t=blpapi_Name ;
 
 struct blpapi_Operation;
-blpapi_Operation blpapi_Operation_t;
+alias blpapi_Operation_t=blpapi_Operation ;
 
 struct blpapi_ProviderSession;
-blpapi_ProviderSession blpapi_ProviderSession_t;
+alias blpapi_ProviderSession_t=blpapi_ProviderSession ;
 
 struct blpapi_Service;
-blpapi_Service blpapi_Service_t;
+alias  blpapi_Service_t=blpapi_Service;
 
 struct blpapi_Session;
-blpapi_Session blpapi_Session_t;
+alias blpapi_Session_t=blpapi_Session ;
 
 struct blpapi_SessionOptions;
-blpapi_SessionOptions blpapi_SessionOptions_t;
+alias blpapi_SessionOptions_t = blpapi_SessionOptions ;
 
 struct blpapi_SubscriptionItrerator;
-blpapi_SubscriptionItrerator blpapi_SubscriptionIterator_t;
+alias blpapi_SubscriptionIterator_t = blpapi_SubscriptionItrerator ;
 
 struct blpapi_Identity;
-blpapi_Identity blpapi_UserHandle;
-blpapi_Identity blpapi_UserHandle_t;
-
-struct blpapi_Identity;
-blpapi_Identity blpapi_Identity_t;
+alias blpapi_UserHandle=blpapi_Identity;
+alias blpapi_UserHandle_t= blpapi_Identity;
+alias blpapi_Identity_t = blpapi_Identity ;
 
  void blpapi_getVersionInfo(int *majorVersion, int *minorVersion, int *patchVersion, int *buildVersion);
- const char *blpapi_getVersionIdentifier(void);
+  char *blpapi_getVersionIdentifier();
 
 // will make it a template later
 long BLPAPI_MAKE_VERSION(long MAJOR, long MINOR, long PATCH)
@@ -753,5 +739,8 @@ long BLPAPI_MAKE_VERSION(long MAJOR, long MINOR, long PATCH)
  return((MAJOR) * 65536 + (MINOR) * 256 + (PATCH));
 }
  
-alias BLPAPI_SDK_VERSION=BLPAPI_MAKE_VERSION( BLPAPI_VERSION_MAJOR, BLPAPI_VERSION_MINOR, BLPAPI_VERSION_PATCH);
+long BLPAPI_SDK_VERSION()
+{
+    return BLPAPI_MAKE_VERSION(BLPAPI.VERSION_MAJOR, BLPAPI.VERSION_MINOR, BLPAPI.VERSION_PATCH);
 }
+
