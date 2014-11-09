@@ -1,39 +1,48 @@
 import std.stdio;
 import std.string;
+import std.conv;
 import blpapi;
 
-static int streamWriter(const char* data, int length, void *stream)
+void memset(void* ptr, ubyte val, long nbytes)
 {
-	assert(data);
-	assert(stream);
-	return cast(int) fwrite(data, length, 1, cast(FILE *)stream);
+	foreach(i;0..nbytes)
+		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
-static void handleDataEvent(const blpapi_Event_t *event, int updateCount)
+extern (C)
 {
-	blpapi_MessageIterator_t* iter = cast(blpapi_MessageIterator_t*)0;
-	blpapi_Message_t* message = cast(blpapi_Message_t*)0;
-	assert(event);
-	writefln("EventType=%d", blpapi_Event_eventType(event));
-	writefln("updateCount = %d", updateCount);
-	iter = blpapi_MessageIterator_create(event);
-	assert(iter);
-	while (0 == blpapi_MessageIterator_next(iter, &message)) {
-		blpapi_CorrelationId_t correlationId;
-		blpapi_Element_t* messageElements = cast(blpapi_Element_t*)0;
-		assert(message);
-		correlationId = blpapi_Message_correlationId(message, 0);
-		writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
-		writefln("messageType = %s", blpapi_Message_typeString(message));
-		messageElements = blpapi_Message_elements(message);
-		blpapi_Element_print(messageElements, &streamWriter, stdout, 0, 4);
+	static int streamWriter(const char* data, int length, void *stream)
+	{
+		assert(data);
+		assert(stream);
+		return cast(int) fwrite(data, length, 1, cast(FILE *)stream);
 	}
-	blpapi_MessageIterator_destroy(iter);
-}
+	static void handleDataEvent(const blpapi_Event_t *event, int updateCount)
+	{
+		blpapi_MessageIterator_t* iter = cast(blpapi_MessageIterator_t*)0;
+		blpapi_Message_t* message = cast(blpapi_Message_t*)0;
+		assert(event);
+		writefln("EventType=%d", blpapi_Event_eventType(event));
+		writefln("updateCount = %d", updateCount);
+		iter = blpapi_MessageIterator_create(event);
+		assert(iter);
+		while (0 == blpapi_MessageIterator_next(iter, &message)) {
+			blpapi_CorrelationId_t correlationId;
+			blpapi_Element_t* messageElements = cast(blpapi_Element_t*)0;
+			assert(message);
+			correlationId = blpapi_Message_correlationId(message, 0);
+			writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
+			writefln("messageType = %s", blpapi_Message_typeString(message));
+			messageElements = blpapi_Message_elements(message);
+			blpapi_Element_print(messageElements, &streamWriter, cast(void*)&stdout, 0, 4);
+		}
+		blpapi_MessageIterator_destroy(iter);
+	}
+} // extern (C)
 
 static void handleOtherEvent(const blpapi_Event_t *event)
 {
-	blpapi_MessageIterator_t *iter = 0;
-	blpapi_Message_t *message = 0;
+	blpapi_MessageIterator_t *iter = cast(blpapi_MessageIterator_t *)0;
+	blpapi_Message_t *message = cast(blpapi_Message_t *)0;
 	assert(event);
 	writefln("EventType=%d", blpapi_Event_eventType(event));
 	iter = blpapi_MessageIterator_create(event);
@@ -46,8 +55,8 @@ static void handleOtherEvent(const blpapi_Event_t *event)
 		writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
 		writefln("messageType=%s", blpapi_Message_typeString(message));
 		messageElements = blpapi_Message_elements(message);
-		blpapi_Element_print(messageElements, &streamWriter, stdout, 0, 4);
-		if (BLPAPI_EVENTTYPE_SESSION_STATUS == blpapi_Event_eventType(event) && 0 == strcmp("SessionTerminated", blpapi_Message_typeString(message))){
+		blpapi_Element_print(messageElements, &streamWriter, cast(void*)&stdout, 0, 4);
+		if ((BLPAPI.EVENTTYPE_SESSION_STATUS == blpapi_Event_eventType(event)) && ("SessionTerminated"==blpapi_Message_typeString(message))){
 			writefln("Terminating: %s",blpapi_Message_typeString(message));
 			return;  // should be exit main ?
 		}
@@ -56,19 +65,19 @@ static void handleOtherEvent(const blpapi_Event_t *event)
 }
 int main()
 {
-	blpapi_SessionOptions_t *sessionOptions = 0;
-	blpapi_Session_t *session = 0;
+	blpapi_SessionOptions_t *sessionOptions = cast(blpapi_SessionOptions_t *)0;
+	blpapi_Session_t* session = cast(blpapi_Session_t* )0;
 	blpapi_CorrelationId_t subscriptionId;
-	blpapi_SubscriptionList *subscriptions = 0;
-	const char *fields[1] = {"LAST_PRICE"};
-	const char **options = 0;
+	blpapi_SubscriptionList *subscriptions = cast(blpapi_SubscriptionList *)0;
+	string[] fields = ["LAST_PRICE"];
+	const char **options = cast(const(char**))0;
 	int updateCount = 0;
-	setbuf(stdout, 0); /* NO SHOW */
+	setbuf(cast(shared(_IO_FILE*))&stdout, cast(char*)0); /* NO SHOW */
 	sessionOptions = blpapi_SessionOptions_create();
 	assert(sessionOptions);
 	blpapi_SessionOptions_setServerHost(sessionOptions, "localhost");
-	blpapi_SessionOptions_setServerPort(sessionOptions, "8194");
-	session = blpapi_Session_create(sessionOptions, 0, 0, 0);
+	blpapi_SessionOptions_setServerPort(sessionOptions, 8194);
+	session = blpapi_Session_create(sessionOptions,cast(blpapi_EventHandler_t) 0, cast(blpapi_EventDispatcher*)0, cast(void*)0);
 	assert(session);
 	blpapi_SessionOptions_destroy(sessionOptions);
 	if (0 != blpapi_Session_start(session)) {
@@ -81,21 +90,20 @@ int main()
 		blpapi_Session_destroy(session);
 		return 1;
 	}
-	memset(&subscriptionId, '\0', sizeof(subscriptionId));
-	subscriptionId.size = sizeof(subscriptionId);
-	subscriptionId.valueType = BLPAPI_CORRELATION_TYPE_INT;
+	memset(&subscriptionId, '\0', subscriptionId.size);
+	subscriptionId.valueType = BLPAPI.CORRELATION_TYPE_INT;
 	subscriptionId.value.intValue = cast(blpapi_UInt64_t)2;
 	subscriptions = blpapi_SubscriptionList_create();
 	assert(subscriptions);
-	 blpapi_SubscriptionList_add(subscriptions, "AAPL US Equity", &subscriptionId, fields, options, 1, 0);
-	blpapi_Session_subscribe(session, subscriptions, 0, 0, 0);
+	blpapi_SubscriptionList_add(subscriptions, cast(const(char*))"AAPL US Equity", &subscriptionId, cast(const(char**))fields, cast(const(char**))options, cast(ulong)1, cast(ulong)0);
+	blpapi_Session_subscribe(session, subscriptions, cast(const(blpapi_Identity*))0, cast(const(char*))0, 0);
 	
 	while (1) {
-		blpapi_Event_t *event = 0;
+		blpapi_Event_t* event = cast(blpapi_Event_t* )0;
 		blpapi_Session_nextEvent(session, &event, 0);
 		assert(event);
 		switch (blpapi_Event_eventType(event)) {
-			case BLPAPI_EVENTTYPE_SUBSCRIPTION_DATA:
+			case BLPAPI.EVENTTYPE_SUBSCRIPTION_DATA:
 			handleDataEvent(event, updateCount++);
 			break;
 			default:

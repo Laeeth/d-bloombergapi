@@ -744,3 +744,37 @@ long BLPAPI_SDK_VERSION()
     return BLPAPI_MAKE_VERSION(BLPAPI.VERSION_MAJOR, BLPAPI.VERSION_MINOR, BLPAPI.VERSION_PATCH);
 }
 
+extern (C) alias blpapi_EventHandler_t= void function(blpapi_Event_t* event, blpapi_Session_t* session, void *userData);
+
+extern (C) blpapi_Session_t* blpapi_Session_create(blpapi_SessionOptions_t *parameters, blpapi_EventHandler_t handler, blpapi_EventDispatcher_t* dispatcher, void *userData);
+extern (C) void blpapi_Session_destroy(blpapi_Session_t *session);
+extern (C) int blpapi_Session_start(blpapi_Session_t *session);
+extern (C) int blpapi_Session_startAsync(blpapi_Session_t *session);
+extern (C) int blpapi_Session_stop(blpapi_Session_t* session);
+extern (C) int blpapi_Session_stopAsync(blpapi_Session_t* session);
+extern (C) int blpapi_Session_nextEvent(blpapi_Session_t* session, blpapi_Event_t **eventPointer, uint timeoutInMilliseconds);
+extern (C) int blpapi_Session_tryNextEvent(blpapi_Session_t* session, blpapi_Event_t **eventPointer);
+extern (C) int blpapi_Session_subscribe(blpapi_Session_t *session, const blpapi_SubscriptionList_t *subscriptionList, const blpapi_Identity_t* handle, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_resubscribe(blpapi_Session_t *session, const blpapi_SubscriptionList_t *resubscriptionList, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_resubscribeWithId(blpapi_Session_t *session, const blpapi_SubscriptionList_t *resubscriptionList, int resubscriptionId, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_unsubscribe(blpapi_Session_t *session, const blpapi_SubscriptionList_t *unsubscriptionList, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_cancel(blpapi_Session_t *session, const blpapi_CorrelationId_t *correlationIds, size_t numCorrelationIds, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_setStatusCorrelationId(blpapi_Session_t *session, const blpapi_Service_t *service, const blpapi_Identity_t *identity, const blpapi_CorrelationId_t *correlationId);
+extern (C) int blpapi_Session_sendRequest(blpapi_Session_t *session, const blpapi_Request_t *request, blpapi_CorrelationId_t *correlationId, blpapi_Identity_t *identity, blpapi_EventQueue_t *eventQueue, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_sendAuthorizationRequest(blpapi_Session_t *session, const blpapi_Request_t *request, blpapi_Identity_t *identity, blpapi_CorrelationId_t *correlationId, blpapi_EventQueue_t *eventQueue, const char *requestLabel, int requestLabelLen);
+extern (C) int blpapi_Session_openService(blpapi_Session_t *session, const char* serviceName);
+extern (C) int blpapi_Session_openServiceAsync(blpapi_Session_t *session, const char* serviceName, blpapi_CorrelationId_t *correlationId);
+extern (C) int blpapi_Session_generateToken(blpapi_Session_t *session, blpapi_CorrelationId_t *correlationId, blpapi_EventQueue_t *eventQueue);
+extern (C) int blpapi_Session_getService(blpapi_Session_t *session, blpapi_Service_t **service, const char* serviceName);
+extern (C) blpapi_UserHandle_t* blpapi_Session_createUserHandle(blpapi_Session_t *session);
+extern (C) blpapi_Identity_t* blpapi_Session_createIdentity(blpapi_Session_t *session);
+extern (C) blpapi_AbstractSession_t* blpapi_Session_getAbstractSession(blpapi_Session_t* session);
+extern (C) blpapi_SubscriptionIterator_t* blpapi_SubscriptionItr_create(blpapi_Session_t *session);
+extern (C) void blpapi_SubscriptionItr_destroy(blpapi_SubscriptionIterator_t *iterator);
+extern (C) int blpapi_SubscriptionItr_next(blpapi_SubscriptionIterator_t *iterator, const char** subscriptionString, blpapi_CorrelationId_t *correlationId, int *status);
+extern (C) int blpapi_SubscriptionItr_isValid(const blpapi_SubscriptionIterator_t *iterator);
+
+extern (C) void blpapi_Request_destroy(blpapi_Request_t *request);
+extern (C) blpapi_Element_t* blpapi_Request_elements(blpapi_Request_t *request);
+extern (C) void blpapi_Request_setPreferredRoute(blpapi_Request_t *request, blpapi_CorrelationId_t *correlationId);
+
