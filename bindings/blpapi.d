@@ -99,6 +99,11 @@ string binarytostring(T)(T myinp)
 struct xbitmap {
     uint blob;
 
+    uint asuint()
+    {
+      return blob;
+    }
+
     uint maskmsb(uint bits)
     {
         uint mask=0;
@@ -210,7 +215,7 @@ struct xbitmap {
       {
        auto blob=xbitmap(x);
        blob.size=x;
-       x=cast(uint)blob;
+       x=blob.asuint();
       }
       uint valueType()
       {
@@ -220,7 +225,7 @@ struct xbitmap {
       {
         auto blob=xbitmap(x);
         blob.valueType=param;
-        x=cast(uint)blob;
+        x=blob.asuint();
       }
       uint classId()
       {
@@ -230,7 +235,7 @@ struct xbitmap {
       {
         auto blob=xbitmap(x);
         blob.classId=param;
-        x=cast(uint)blob;
+        x=blob.asuint();
       }
     }
 
