@@ -9,7 +9,7 @@ void memset(void* ptr, ubyte val, long nbytes)
 	foreach(i;0..nbytes)
 		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
-extern (C)
+extern (Windows)
 {
 	static int streamWriter(const char* data, int length, void *stream)
 	{
@@ -33,7 +33,7 @@ extern (C)
 			assert(referenceDataResponse);
 			if (blpapi_Element_hasElement(referenceDataResponse, cast(const(char*))"responseError", cast(const(blpapi_Name*))0)) {
 				stderr.writefln("has responseError");
-				blpapi_Element_print(referenceDataResponse, &streamWriter, cast(void*)&stdout, 0, 4);
+				blpapi_Element_print(cast(const(blpapi_Element*))referenceDataResponse, &streamWriter, cast(void*)&stdout, 0, 4);
 				throw new Exception("response error");
 			}
 			blpapi_Element_getElement(referenceDataResponse, &securityDataArray, "securityData", cast(const(blpapi_Name*))0);
@@ -105,7 +105,7 @@ extern (C)
 			blpapi_Element_t *messageElements = cast(blpapi_Element_t *)0;
 			assert(message);
 			correlationId = blpapi_Message_correlationId(message, 0);
-			writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
+			writefln("correlationId=%d %d %lld", correlationId.xx.valueType, correlationId.xx.classId, correlationId.value.intValue);
 			writefln("messageType=%s", blpapi_Message_typeString(message));
 			messageElements = blpapi_Message_elements(message);
 			assert(messageElements);
@@ -148,8 +148,8 @@ int main(string[] argv)
 		return 1;
 	}
 
-	memset(&requestId, '\0', requestId.size);
-	requestId.valueType = BLPAPI.CORRELATION_TYPE_INT;
+	memset(&requestId, '\0', requestId.xx.size);
+	requestId.xx.valueType = BLPAPI.CORRELATION_TYPE_INT;
 	requestId.value.intValue = cast(blpapi_UInt64_t)1;
 	blpapi_Session_getService(session, &refDataSvc, "//blp/refdata");
 	blpapi_Service_createRequest(refDataSvc, &request, "ReferenceDataRequest");
@@ -165,8 +165,8 @@ int main(string[] argv)
 	blpapi_Element_setValueString(fieldsElements, "PX_LAST", BLPAPI.ELEMENT_INDEX_END);
 	blpapi_Element_setValueString(fieldsElements, "DS002", BLPAPI.ELEMENT_INDEX_END);
 	blpapi_Element_setValueString(fieldsElements, "VWAP_VOLUME", BLPAPI.ELEMENT_INDEX_END);
-	memset(&correlationId, '\0', correlationId.size);
-	correlationId.valueType = BLPAPI.CORRELATION_TYPE_INT;
+	memset(&correlationId, '\0', correlationId.xx.size);
+	correlationId.xx.valueType = BLPAPI.CORRELATION_TYPE_INT;
 	correlationId.value.intValue = cast(blpapi_UInt64_t)1;
 	blpapi_Session_sendRequest(session, request, &correlationId,cast(blpapi_Identity*) 0, cast(blpapi_EventQueue*)0, cast(const(char*))0, 0);
 	

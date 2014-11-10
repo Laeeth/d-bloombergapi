@@ -11,7 +11,7 @@ void memset(void* ptr, ubyte val, long nbytes)
 		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
 
-extern (C)
+extern (Windows)
 {
 	static int streamWriter(const char* data, int length, void *stream)
 	{
@@ -34,7 +34,7 @@ extern (C)
 			assert(message);
 			writefln("messageType=%s", blpapi_Message_typeString(message));
 			correlationId = blpapi_Message_correlationId(message, 0);
-			writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
+			writefln("correlationId=%d %d %lld", correlationId.xx.valueType, correlationId.xx.classId, correlationId.value.intValue);
 			messageElements = blpapi_Message_elements(message);
 			assert(messageElements);
 			blpapi_Element_print(messageElements, &streamWriter, cast(void*)&stdout, 0, 4);
@@ -54,9 +54,9 @@ extern (C)
 				while (0 == blpapi_MessageIterator_next(iter, &message)) {
 					if ("SessionStarted" == blpapi_Message_typeString(message)) {
 						blpapi_CorrelationId_t correlationId;
-						memset(&correlationId, '\0', correlationId.size);
-						correlationId.size = correlationId.size;
-						correlationId.valueType = BLPAPI.CORRELATION_TYPE_INT;
+						memset(&correlationId, '\0', correlationId.sizeof);
+						//correlationId.size = correlationId.sizeof;
+						//correlationId.valueType = BLPAPI.CORRELATION_TYPE_INT;
 						correlationId.value.intValue = cast(blpapi_UInt64_t)99;
 						blpapi_Session_openServiceAsync(session, "//blp/refdata", &correlationId);
 					} else {
@@ -97,8 +97,9 @@ extern (C)
 						blpapi_Element_setValueString(securitiesElements, "IBM US Equity", BLPAPI.ELEMENT_INDEX_END);
 						blpapi_Element_getElement(elements, &fieldsElements, "fields", cast(const(blpapi_Name*))0);
 						blpapi_Element_setValueString(fieldsElements, "PX_LAST", BLPAPI.ELEMENT_INDEX_END);
-						memset(&correlationId, '\0', correlationId.size);
-						correlationId.valueType = BLPAPI.CORRELATION_TYPE_INT;
+						memset(&correlationId, '\0', correlationId.sizeof);
+						correlationId.xx.size=correlationId.sizeof;
+						correlationId.xx.valueType = BLPAPI.CORRELATION_TYPE_INT;
 						correlationId.value.intValue = cast(blpapi_UInt64_t)86;
 						blpapi_Session_sendRequest(session, request, &correlationId, cast(blpapi_Identity*)0, cast(blpapi_EventQueue*)0, cast(const(char*))0, 0);
 					}
@@ -134,24 +135,33 @@ extern (C)
 			
 		}
 	}
-} //extern (C)
+
+	int winmain(string[] args)
+	{
+		blpapi_SessionOptions_t* sessionOptions = cast(blpapi_SessionOptions_t*)0;
+		//blpapi_Session_t* session = cast(blpapi_Session_t*)0;
+		sessionOptions = blpapi_SessionOptions_create();
+		assert(sessionOptions);
+		blpapi_SessionOptions_setServerHost(sessionOptions, "localhost");
+		blpapi_SessionOptions_setServerPort(sessionOptions, 8194);
+		auto session = blpapi_Session_create(sessionOptions, &processEvent, cast(blpapi_EventDispatcher*)0, cast(void*)0);
+		assert(session);
+		blpapi_SessionOptions_destroy(sessionOptions);
+		if (blpapi_Session_start(session)!=0) {
+			stderr.writefln("Failed to start async session");
+			blpapi_Session_destroy(session);
+			return 1;
+		}
+		//pause(); from threading header
+		blpapi_Session_destroy(session);
+		return 0;
+	}
+
+} extern (Windows)
+
 int main(string[] args)
 {
-	blpapi_SessionOptions_t* sessionOptions = cast(blpapi_SessionOptions_t*)0;
-	blpapi_Session_t* session = cast(blpapi_Session_t*)0;
-	sessionOptions = blpapi_SessionOptions_create();
-	assert(sessionOptions);
-	blpapi_SessionOptions_setServerHost(sessionOptions, "localhost");
-	blpapi_SessionOptions_setServerPort(sessionOptions, 8194);
-	session = blpapi_Session_create(sessionOptions, &processEvent, cast(blpapi_EventDispatcher*)0, cast(void*)0);
-	assert(session);
-	blpapi_SessionOptions_destroy(sessionOptions);
-	if (0 != blpapi_Session_start(session)) {
-		stderr.writefln("Failed to start async session");
-		blpapi_Session_destroy(session);
-		return 1;
-	}
-	//pause(); from threading header
-	blpapi_Session_destroy(session);
-	return 0;
+	return winmain(args);
+
 }
+

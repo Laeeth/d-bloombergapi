@@ -8,7 +8,7 @@ void memset(void* ptr, ubyte val, long nbytes)
 	foreach(i;0..nbytes)
 		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
-extern (C)
+extern (Windows)
 {
 	static int streamWriter(const char* data, int length, void *stream)
 	{
@@ -37,32 +37,33 @@ extern (C)
 		}
 		blpapi_MessageIterator_destroy(iter);
 	}
-} // extern (C)
 
-static void handleOtherEvent(const blpapi_Event_t *event)
-{
-	blpapi_MessageIterator_t *iter = cast(blpapi_MessageIterator_t *)0;
-	blpapi_Message_t *message = cast(blpapi_Message_t *)0;
-	assert(event);
-	writefln("EventType=%d", blpapi_Event_eventType(event));
-	iter = blpapi_MessageIterator_create(event);
-	assert(iter);
-	while (0 == blpapi_MessageIterator_next(iter, &message)) {
-		blpapi_CorrelationId_t correlationId;
-		blpapi_Element_t* messageElements = cast(blpapi_Element_t*)0;
-		assert(message);
-		correlationId = blpapi_Message_correlationId(message, 0);
-		writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
-		writefln("messageType=%s", blpapi_Message_typeString(message));
-		messageElements = blpapi_Message_elements(message);
-		blpapi_Element_print(messageElements, &streamWriter, cast(void*)&stdout, 0, 4);
-		if ((BLPAPI.EVENTTYPE_SESSION_STATUS == blpapi_Event_eventType(event)) && ("SessionTerminated"==blpapi_Message_typeString(message))){
-			writefln("Terminating: %s",blpapi_Message_typeString(message));
-			return;  // should be exit main ?
+	static void handleOtherEvent(const blpapi_Event_t *event)
+	{
+		blpapi_MessageIterator_t *iter = cast(blpapi_MessageIterator_t *)0;
+		blpapi_Message_t *message = cast(blpapi_Message_t *)0;
+		assert(event);
+		writefln("EventType=%d", blpapi_Event_eventType(event));
+		iter = blpapi_MessageIterator_create(event);
+		assert(iter);
+		while (0 == blpapi_MessageIterator_next(iter, &message)) {
+			blpapi_CorrelationId_t correlationId;
+			blpapi_Element_t* messageElements = cast(blpapi_Element_t*)0;
+			assert(message);
+			correlationId = blpapi_Message_correlationId(message, 0);
+			writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
+			writefln("messageType=%s", blpapi_Message_typeString(message));
+			messageElements = blpapi_Message_elements(message);
+			blpapi_Element_print(messageElements, &streamWriter, cast(void*)&stdout, 0, 4);
+			if ((BLPAPI.EVENTTYPE_SESSION_STATUS == blpapi_Event_eventType(event)) && ("SessionTerminated"==blpapi_Message_typeString(message))){
+				writefln("Terminating: %s",blpapi_Message_typeString(message));
+				return;  // should be exit main ?
+			}
 		}
+		blpapi_MessageIterator_destroy(iter);
 	}
-	blpapi_MessageIterator_destroy(iter);
 }
+
 int main()
 {
 	blpapi_SessionOptions_t *sessionOptions = cast(blpapi_SessionOptions_t *)0;

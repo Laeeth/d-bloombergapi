@@ -9,7 +9,7 @@ void memset(void* ptr, ubyte val, long nbytes)
 		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
 
-extern (C)
+extern (Windows)
 {
 
 	static int streamWriter(const char* data, int length, void *stream)
@@ -103,7 +103,7 @@ int main(string[] argv)
 {
 	blpapi_SessionOptions_t *sessionOptions = cast(blpapi_SessionOptions_t *)0;
 	blpapi_Session_t *session = cast(blpapi_Session_t*)0;
-	UserData_t userData = { "myLabel", cast(shared(_IO_FILE*))&stdout };
+	UserData_t userData = { "myLabel", cast(shared(_iobuf*))&stdout };
 	/* IBM */
 	string topic_IBM = "IBM US Equity";
 	string[] fields_IBM = [ "LAST_TRADE" ];
@@ -128,7 +128,7 @@ int main(string[] argv)
 	const char** options_097023105 = cast(const char**)0;
 	int numFields_097023105 = 0;
 	int numOptions_097023105 = 0;
-	setbuf(cast(shared(_IO_FILE*))&stdout, cast(char*)0); /* DO NOT SHOW */
+	setbuf(cast(shared(_iobuf*))&stdout, cast(char*)0); /* DO NOT SHOW */
 	blpapi_CorrelationId_t subscriptionId_IBM;
 	blpapi_CorrelationId_t subscriptionId_GOOG;
 	blpapi_CorrelationId_t subscriptionId_MSFT;
