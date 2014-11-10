@@ -1,4 +1,8 @@
-import std.bitmanip;
+
+import std.stdio;
+import std.conv;
+import std.format;
+import std.string;
 /**
  Copyright 2012. Bloomberg Finance L.P.
  
@@ -70,6 +74,27 @@ extern(Windows)
    blpapi_ManagedPtr_t_data_ userData[4];
    blpapi_ManagedPtr_ManagerFunction_t manager;
   }
+
+
+string binarytostring(T)(T myinp)
+{
+  string s="";
+  auto inplen=cast(ulong)myinp.sizeof*8;
+  auto inp=cast(ulong)myinp;
+  foreach(i;1L..inplen+1L)
+  {
+    debug
+    {
+      writefln("inp=%s,inplen-i=%s,i=%s,1<<inplen-i=%s,inp&=%s", inp,inplen-i,cast(ulong)(1L<<(inplen-i)),i,cast(ulong)(inp&(1L<<(inplen-i))));
+    }
+
+    if ((inp & (1L<<(inplen-i)))>0)
+      s~="1";
+    else
+      s~="0";
+  }
+  return s;
+}
 
 struct xbitmap {
     uint blob;
