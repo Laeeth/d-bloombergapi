@@ -2,3 +2,5 @@
 *.o
 *.c
 stderr*
+*.lib
+*.exe
