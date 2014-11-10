@@ -187,18 +187,53 @@ struct xbitmap {
   }
 
   struct blpapi_CorrelationId_t_ {
-      uint x;                           //bit fields cause problems with linkage
-        
-      union _value {
-          blpapi_UInt64_t      intValue;
-          blpapi_ManagedPtr_t  ptrValue;
-      };
-      _value value;
+    uint x;                           //bit fields cause problems with linkage
+      
+    union _value {
+        blpapi_UInt64_t      intValue;
+        blpapi_ManagedPtr_t  ptrValue;
+    };
+    _value value;
 
-      extern(Windows) xbitmap* xx()
+    extern(Windows) xbitmap* xx()
+    {
+      return cast(xbitmap*)&x;
+    }
+    
+    @property
+    {
+      uint size()
       {
-        return cast(xbitmap*)&x;
+        return xbitmap(x).size;
       }
+      void size(uint paramsize)
+      {
+       blob=xbitmap(x);
+       blob.size=x;
+       x=cast(uint)blob;
+      }
+      uint valueType()
+      {
+        return xbitmap(x).valueType;
+      }
+      void valueType(uint param)
+      {
+        blob=xbitmap(x);
+        blob.valueType=param;
+        x=cast(uint)blob;
+      }
+      uint classId()
+      {
+        return xbitmap(x).classId;
+      }
+      void classId(uint param)
+      {
+        blob=xbitmap(x);
+        blob.classId=param;
+        x=cast(uint)blob;
+      }
+    }
+
   }
 
   alias blpapi_CorrelationId_t=blpapi_CorrelationId_t_ ;
