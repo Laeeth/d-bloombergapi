@@ -97,7 +97,7 @@ extern (Windows)
 		blpapi_MessageIterator_t *iter = cast(blpapi_MessageIterator_t*)0;
 		blpapi_Message_t *message = cast(blpapi_MessageIterator_t*)0;
 		assert(event);
-		printf("EventType=%d\n", blpapi_Event_eventType(event));
+		writefln("EventType=%d", blpapi_Event_eventType(event));
 		iter = blpapi_MessageIterator_create(event);
 		assert(iter);
 		while (0 == blpapi_MessageIterator_next(iter, &message)) {
@@ -105,7 +105,7 @@ extern (Windows)
 			blpapi_Element_t *messageElements = cast(blpapi_Element_t *)0;
 			assert(message);
 			correlationId = blpapi_Message_correlationId(message, 0);
-			writefln("correlationId=%d %d %lld", correlationId.xx.valueType, correlationId.xx.classId, correlationId.value.intValue);
+			writefln("correlationId=%d %d %s", correlationId.xx.valueType, correlationId.xx.classId, correlationId.value.intValue);
 			writefln("messageType=%s", blpapi_Message_typeString(message));
 			messageElements = blpapi_Message_elements(message);
 			assert(messageElements);

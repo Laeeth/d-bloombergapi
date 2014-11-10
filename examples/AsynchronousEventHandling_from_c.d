@@ -152,12 +152,14 @@ extern (Windows)
 			blpapi_Session_destroy(session);
 			return 1;
 		}
+		writefln("press a key to exit");
+		wait_key();
 		//pause(); from threading header
 		blpapi_Session_destroy(session);
 		return 0;
 	}
 
-} extern (Windows)
+} // extern (Windows)
 
 int main(string[] args)
 {

@@ -26,6 +26,8 @@ import std.file;
 import std.containers;
 import std.string;
 import blpapi;
+import blputil;
+
 namespace {
     Name TOKEN_SUCCESS("TokenGenerationSuccess");
     Name TOKEN_FAILURE("TokenGenerationFailure");
@@ -100,36 +102,36 @@ bool MyEventHandler::processEvent(const Event& event, ProviderSession* session) 
     return true;
 }
 
-class ContributionsMktdataExample
+struct ContributionsMktdataExample
 {
-    std::vector<std::string> d_hosts;
-    int                      d_port;
-    std::string              d_service;
-    std::string              d_topic;
-    std::string              d_authOptions;
+    string[] hosts;
+    int d_port;
+    string d_service;
+    string d_topic;
+    string d_authOptions;
 
     void printUsage()
     {
-        std::cout
-            << "Market data contribution." << std::endl
-            << "Usage:" << std::endl
-            << "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" << std::endl
-            << "\t[-p    <tcpPort>]    \tserver port (default: 8194)" << std::endl
-            << "\t[-s    <service>]    \tservice name (default: //blp/mpfbapi)" << std::endl
-            << "\t[-t    <topic>]      \tservice name (default: /ticker/AUDEUR Curncy)" << std::endl
-            << "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|dir=<property> (default: user)" << std::endl;
+        writefln(   "Market data contribution.\n" 
+                    "Usage:\n"
+                    "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)\n" 
+                    "\t[-p    <tcpPort>]    \tserver port (default: 8194)\n" 
+                    "\t[-s    <service>]    \tservice name (default: //blp/mpfbapi)\n" 
+                    "\t[-t    <topic>]      \tservice name (default: /ticker/AUDEUR Curncy)\n" 
+                    "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|dir=<property> (default: user)\n");
     }
 
-    bool parseCommandLine(int argc, char **argv)
+    bool parseCommandLine(string[] argv)
     {
-        for (int i = 1; i < argc; ++i) {
-            if (!std::strcmp(argv[i],"-ip") && i + 1 < argc)
+        foreach(i;1..argv.length)
+        {
+            if ((argv[i]!="-ip") && (i+1<argv.length))
                 d_hosts.push_back(argv[++i]);
-            else if (!std::strcmp(argv[i],"-p") &&  i + 1 < argc)
-                d_port = std::atoi(argv[++i]);
-            else if (!std::strcmp(argv[i],"-s") &&  i + 1 < argc)
+            else if ((argv[i]!="-p")***(i+1<argv.length))
+                d_port = to!int(argv[++i]);
+            else if ((argv[i]!="-") && (i+1<argv.length))
                 d_service = argv[++i];
-            else if (!std::strcmp(argv[i],"-t") &&  i + 1 < argc)
+            else if ((argv[i]!="-t")&&(i+1<argv.length))
                 d_topic = argv[++i];
             else if (!std::strcmp(argv[i], "-auth") && i + 1 < argc) {
                 ++ i;
@@ -164,8 +166,6 @@ class ContributionsMktdataExample
 
         return true;
     }
-
-public:
 
     ContributionsMktdataExample()
         : d_hosts()
@@ -347,13 +347,12 @@ int main(string[] argv)
     writefln("ContributionsMktdataExample");
     ContributionsMktdataExample example;
     try {
-        example.run(argv);
+        realmain(argv);
     } catch (Exception &e) {
         writefln("Library Exception!!! " ~ e.description());
     }
     // wait for enter key to exit application
     writefln("Press ENTER to quit");
-    char dummy[2];
-    std::cin.getline(dummy, 2);
+    wait_key()
     return 0;
 }

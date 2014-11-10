@@ -22,6 +22,8 @@ import std.string;
 import std.stdio;
 import std.stdlib;
 import blp;
+import blputils;
+
 namespace {
 
     const Name RESPONSE_ERROR("responseError");
@@ -344,7 +346,7 @@ int main(string[] argv)
     }
 
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
+    writefln("Press ENTER to quit");
     char dummy[2];
     std::cin.getline(dummy, 2);
 
