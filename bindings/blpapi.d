@@ -199,7 +199,7 @@ struct xbitmap {
     {
       return cast(xbitmap*)&x;
     }
-    
+
     @property
     {
       uint size()
@@ -208,7 +208,7 @@ struct xbitmap {
       }
       void size(uint paramsize)
       {
-       blob=xbitmap(x);
+       auto blob=xbitmap(x);
        blob.size=x;
        x=cast(uint)blob;
       }
@@ -218,7 +218,7 @@ struct xbitmap {
       }
       void valueType(uint param)
       {
-        blob=xbitmap(x);
+        auto blob=xbitmap(x);
         blob.valueType=param;
         x=cast(uint)blob;
       }
@@ -228,7 +228,7 @@ struct xbitmap {
       }
       void classId(uint param)
       {
-        blob=xbitmap(x);
+        auto blob=xbitmap(x);
         blob.classId=param;
         x=cast(uint)blob;
       }
