@@ -7,14 +7,14 @@ version(Windows)
 	extern(C) int kbhit();
 	extern(C) int getch();
 
-	char wait_keypress()
+	char wait_key()
 	{
     	while(!kbhit())
     	{
 	        // keep polling
     	    // might use Thread.Sleep here to avoid taxing the cpu.
     	}
-	    return cast(car)getch();
+	    return cast(char)getch();
 	}
 }
 
@@ -24,7 +24,7 @@ else // version(!Windows)
 	import std.c.linux.termios;
 	extern(C) void cfmakeraw(termios *termios_p);
 
-	char wait_keypress() 
+	char wait_key() 
 	{
 	    termios  ostate;                 /* saved tty state */
 	    termios  nstate;                 /* values for editor mode */

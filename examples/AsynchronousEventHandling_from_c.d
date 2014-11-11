@@ -55,8 +55,8 @@ extern (Windows)
 					if ("SessionStarted" == blpapi_Message_typeString(message)) {
 						blpapi_CorrelationId_t correlationId;
 						memset(&correlationId, '\0', correlationId.sizeof);
-						//correlationId.size = correlationId.sizeof;
-						//correlationId.valueType = BLPAPI.CORRELATION_TYPE_INT;
+						correlationId.xx.size = correlationId.sizeof;
+						correlationId.xx.valueType = BLPAPI.CORRELATION_TYPE_INT;
 						correlationId.value.intValue = cast(blpapi_UInt64_t)99;
 						blpapi_Session_openServiceAsync(session, "//blp/refdata", &correlationId);
 					} else {
