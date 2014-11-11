@@ -135,8 +135,8 @@ usage["contibutemktdata"]=
                     	"\t[-t    <topic>]      \tservice name (default: /ticker/AUDEUR Curncy)\n" 
                     	"\t[-auth <option>]     \tauthentication option: user|none|app=<app>|dir=<property> (default: user)\n");
     
-usage["entitlements"]=	 "Usage:" << '\n'
-         				"    Entitlements verification example\n" 
+usage["entitlements"]=	 "Usage:\n"
+        				"    Entitlements verification example\n" 
          				"        [-s     <security   = IBM US Equity>]\n" 
 			            "        [-f     <field  = BEST_BID1>]\n"
          				"        [-c     <credential uuid:ipAddress\n" 
@@ -160,14 +160,14 @@ usage["publishtopic"]=	"Publish on a topic. \n"
 			             "\t[-auth <option>]       \tauthentication option: user|none|app=<app>|dir=<property> (default: user)\n";
 
 usage["verifytoken"]=
-				         "Usage:" << '\n'
-				         "    Entitlements verification token example" << '\n'
-				         "        [-s     <security   = MSFT US Equity>]" << '\n'
+				         "Usage:\n" 
+				         "    Entitlements verification token example" 
+				        "[-s     <security   = MSFT US Equity>]" 
 				         "        [-t     <token string>]"
-				         " ie. token value returned in generateToken response" << '\n'
-				         "        [-ip    <ipAddress  = localhost>]" << '\n'
-				         "        [-p     <tcpPort    = 8194>]" << '\n'
-				         "Note:" << '\n'
+				         " ie. token value returned in generateToken response\n"
+				         "        [-ip    <ipAddress  = localhost>]\n"
+				         "        [-p     <tcpPort    = 8194>]\n'
+				         "Note:\n"
 				         "Multiple securities and tokens can be specified.");
 
 usage["gentoken"]=
@@ -209,38 +209,38 @@ usage["intradayticks"]="Usage:" << '\n'
 				         "2) Only one security can be specified.");
 
 usage["realtime"]= 		"Retrieve realtime data."
-			            << "Usage:" 
-			            << "\t[-ip   <ipAddress>]\tserver name or IP (default: localhost)" 
-			            << "\t[-p    <tcpPort>]  \tserver port (default: 8194)" 
-			            << "\t[-s    <service>]  \tservice name (default: //viper/mktdata))" 
-			            << "\t[-t    <topic>]    \ttopic name (default: /ticker/IBM Equity)" 
-			            << "\t[-f    <field>]    \tfield to subscribe to (default: empty)" 
-			            << "\t[-o    <option>]   \tsubscription options (default: empty)" 
-			            << "\t[-me   <maxEvents>]\tstop after this many events (default: INT_MAX)" 
-			            << "\t[-auth <option>]   \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)" 
+			        	 "Usage:" 
+			             "\t[-ip   <ipAddress>]\tserver name or IP (default: localhost)" 
+			             "\t[-p    <tcpPort>]  \tserver port (default: 8194)" 
+			             "\t[-s    <service>]  \tservice name (default: //viper/mktdata))" 
+			             "\t[-t    <topic>]    \ttopic name (default: /ticker/IBM Equity)" 
+			             "\t[-f    <field>]    \tfield to subscribe to (default: empty)" 
+			             "\t[-o    <option>]   \tsubscription options (default: empty)" 
+			             "\t[-me   <maxEvents>]\tstop after this many events (default: INT_MAX)" 
+			             "\t[-auth <option>]   \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)" 
 usage["pagemon"]=		 "Page monitor."
-			            << "Usage:" << std::endl
-			            << "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" 
-			            << "\t[-p    <tcpPort>]    \tserver port (default: 8194)" 
-			            << "\t[-s    <service>]    \tservice name (default: //viper/page)" 
-			            << "\t[-me   <maxEvents>]  \tnumber of events to retrieve (default: MAX_INT)" 
-			            << "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)";
+			             "Usage:" 
+			             "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" 
+			             "\t[-p    <tcpPort>]    \tserver port (default: 8194)" 
+			             "\t[-s    <service>]    \tservice name (default: //viper/page)" 
+			             "\t[-me   <maxEvents>]  \tnumber of events to retrieve (default: MAX_INT)" 
+			             "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)";
 
 usage["publishmarket"]=	"Publish market data."
-			            << "Usage:"
-			            << "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" 
-			            << "\t[-p    <tcpPort>]    \tserver port (default: 8194)"
-			            << "\t[-s    <service>]    \tservice name (default: //viper/mktdata)"
-			            << "\t[-f    <field>]      \tfields (default: LAST_PRICE)"
-			            << "\t[-m    <messageType>]\ttype of published event (default: MarketDataEvents)"
-			            << "\t[-t    <topic>]      \ttopic (default: IBM Equity>]"
-			            << "\t[-g    <groupId>]    \tpublisher groupId (defaults to unique value)"
-			            << "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|dir=<property> (default: user)";
-			                << "\t[-e    <EID>]        \tpermission eid for all subscriptions"
-			            << "\t[-pri  <priority>]   \tset publisher priority level"<< " (default: 10)"
-			            << "\t[-c    <event count>]\tnumber of events after which cache"<< " will be cleared (default: 0 i.e cache never cleared)"
-			            << "\t[-ssc <option>]      \tactive sub-service code option:"<< "<begin>,<end>,<priority> "
-			            << "\t[-rssc <option>      \tsub-service code to be used in"<< " resolves."
+			             "Usage:"
+			             "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)" 
+			             "\t[-p    <tcpPort>]    \tserver port (default: 8194)"
+			             "\t[-s    <service>]    \tservice name (default: //viper/mktdata)"
+			             "\t[-f    <field>]      \tfields (default: LAST_PRICE)"
+			             "\t[-m    <messageType>]\ttype of published event (default: MarketDataEvents)"
+			             "\t[-t    <topic>]      \ttopic (default: IBM Equity>]"
+			             "\t[-g    <groupId>]    \tpublisher groupId (defaults to unique value)"
+			             "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|dir=<property> (default: user)";
+			                 "\t[-e    <EID>]        \tpermission eid for all subscriptions"
+			             "\t[-pri  <priority>]   \tset publisher priority level" " (default: 10)"
+			             "\t[-c    <event count>]\tnumber of events after which cache" " will be cleared (default: 0 i.e cache never cleared)"
+			             "\t[-ssc <option>]      \tactive sub-service code option:" "<begin>,<end>,<priority> "
+			             "\t[-rssc <option>      \tsub-service code to be used in" " resolves."
 usage["publishtopic"]=	("Publish on a topic. \n"
 			         "Usage:\n" 
 			         "\t[-ip   <ipAddress>]  \tserver name or IP (default: localhost)\n"
@@ -259,8 +259,8 @@ usage["retrieveref"]=	"Usage:\n"
 				         "        [-v         increase verbosity\n"
 				         " (can be specified more than once)\n");
 
-			            << "\t[-r    <option>]     \tservice role option: server|client|both (default: both)";
-            			<< "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)"
+			             "\t[-r    <option>]     \tservice role option: server|client|both (default: both)";
+            			 "\t[-auth <option>]     \tauthentication option: user|none|app=<app>|userapp=<app>|dir=<property> (default: user)"
 
 
 usage["securitylookup"]="Usage: SecurityLookupExample [options]\n"
@@ -350,7 +350,7 @@ usage["securitylookup"]="Usage: SecurityLookupExample [options]\n"
 	    while (iter.next()) {
 	        Message msg = iter.message();
 	        MutexGuard guard(&g_mutex);
-	        msg.print(std::cout);
+	        writefln("%s",msg);
 	        if (g_authorizationStatus.find(msg.correlationId()) != g_authorizationStatus.end()) {
 	            if (msg.messageType() == AUTHORIZATION_SUCCESS) {
 	                g_authorizationStatus[msg.correlationId()] = AUTHORIZED;
@@ -374,7 +374,7 @@ void openServices(Session *session,bool staticdata,bool mktdata)
     if staticdata
 	{
 		if (!session.openService(REFDATA_SVC)) {
-    		writefln("Failed to open service: %s" << REFDATA_SVC);
+    		writefln("Failed to open service: %s", REFDATA_SVC);
     		throw new Exception("Failed to open service: "~REFDATA_SVC);
 		}
 	}
@@ -530,7 +530,7 @@ bool processEvent(const Event& event, ProviderSession* session)
         MessageIterator iter(event);
         while (iter.next()) {
             Message msg = iter.message();
-            msg.print(std::cout);
+            writefln("%s",msg);
             if (msg.messageType() == Name("ReferenceDataRequest")) {
                 // Similar to createPublishEvent. We assume just one
                 // service - d_service. A responseEvent can only be
@@ -606,10 +606,10 @@ bool processEvent(const Event &event)
             subscribe();
         } else if (msg.messageType() == AUTHORIZATION_FAILURE) {
             writefln("Authorization FAILED");
-            msg.print(std::cout);
+            writefln("%s",msg);
             return false;
         } else {
-            msg.print(std::cout);
+            writefln("%s",msg);
         }
     }
     return true;
@@ -724,7 +724,7 @@ bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
         MessageIterator iter(event);
         while (iter.next()) {
             Message msg = iter.message();
-            msg.print(std::cout);
+            writefln("%s",msg);
             if (msg.messageType() == PERMISSION_REQUEST) {
                 // Similar to createPublishEvent. We assume just one
                 // service - d_service. A responseEvent can only be
@@ -1259,8 +1259,7 @@ void processResponseEvent(Event event)
 
                 Element securities = msg.getElement(SECURITY_DATA);
                 size_t numSecurities = securities.numValues();
-                std::cout << "Processing " << (unsigned int)numSecurities
-                          << " securities:"<< std::endl;
+                writefln("Processing %s securities",cast(uint)numSecurities);
                 for (size_t i = 0; i < numSecurities; ++i) {
                     Element security = securities.getValueAsElement(i);
                     std::string ticker = security.getElementAsString(SECURITY);
@@ -1447,7 +1446,7 @@ void printEvent(const Event &event)
         if (correlationId.asInteger() != 0) {
             writefln("Correlator: %s",correlationId.asInteger());
         }
-        msg.print(std.cout);
+        writefln("%s",msg);
     }
 }
 
@@ -2548,11 +2547,11 @@ void run(int argc, string[] argv)
     writefln("Connecting to %s:%s", d_host , d_port);
     Session session(sessionOptions);
     if (!session.start()) {
-        std::cerr << "Failed to start session." << std::endl;
+        stderr.writefln( "Failed to start session.");
         return;
     }
     if (!session.openService("//blp/refdata")) {
-        std::cerr << "Failed to open //blp/refdata" << std::endl;
+        stderr.writefln("Failed to open //blp/refdata");
         return;
     }
 
@@ -2584,19 +2583,18 @@ void run(int argc, char **argv)
         // so only try to connect to each server once.
         sessionOptions.setNumStartAttempts(d_hosts.size() > 1? 1: 1000);
 
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
-        for (size_t i = 0; i < sessionOptions.numServerAddresses(); ++i) {
-            unsigned short port;
+        writefln("Connecting to port %s on:",d_port);
+        foreach(i;0..sessionOptions.numServerAddresses())
+        {
+            ushort port;
             const char *host;
             sessionOptions.getServerAddress(&host, &port, i);
-            std::cout << (i? ", ": "") << host;
+            writefln((i? ", ": "") ~ host);
         }
-        std::cout << std::endl;
 
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
 
@@ -2610,7 +2608,7 @@ void run(int argc, char **argv)
                         &session, CorrelationId((void *)"auth"));
             }
             if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
+                stderr.writefln("No authorization");
                 return;
             }
         }
@@ -2634,9 +2632,9 @@ void run(int argc, char **argv)
                     event.eventType() == Event::SUBSCRIPTION_DATA) {
 
                     const char *topic = (char *)msg.correlationId().asPointer();
-                    std::cout << topic << " - ";
+                    writefln("%s - ",topic);
                 }
-                msg.print(std::cout) << std::endl;
+                writefln("%s",msg);
             }
             if (event.eventType() == Event::SUBSCRIPTION_DATA) {
                 if (++d_eventCount >= d_maxEvents) break;
@@ -2664,19 +2662,18 @@ void run(int argc, char **argv)
         sessionOptions.setAutoRestartOnDisconnection(true);
         sessionOptions.setNumStartAttempts(2);
 
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
-        for (size_t i = 0; i < sessionOptions.numServerAddresses(); ++i) {
-            unsigned short port;
+        writefln("Connecting to port %s on ", d_port);
+        foreach(i;0..sessionOptions.numServerAddresses())
+        {
+            ushort port;
             const char *host;
             sessionOptions.getServerAddress(&host, &port, i);
-            std::cout << (i? ", ": "") << host;
+            writefln("%s,: ",i,host);
         }
-        std::cout << std::endl;
-
+        
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
 
@@ -2692,7 +2689,7 @@ void run(int argc, char **argv)
                 }
             }
             if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
+                stderr.writefln("No authorization");
                 return;
             }
         }
@@ -2713,9 +2710,9 @@ void run(int argc, char **argv)
                     event.eventType() == Event::SUBSCRIPTION_DATA) {
 
                     const char *topic = (const char *)msg.correlationId().asPointer();
-                    std::cout << topic << " - ";
+                    writefln("%s - ", topic);
                 }
-                msg.print(std::cout) << std::endl;
+                writefln("%s",msg);
             }
             if (event.eventType() == Event::SUBSCRIPTION_DATA) {
                 if (++d_eventCount >= d_maxEvents) break;
@@ -2821,7 +2818,7 @@ void test_topicpublish(0
             }
             eventFormatter.appendMessage(PUBLISH_MESSAGE_TYPE, topic);
 
-            for (unsigned int i = 0; i < d_fields.size(); ++i) {
+            for (uint i = 0; i < d_fields.size(); ++i) {
                 eventFormatter.setElement(
                     d_fields[i],
                     tickCount + (i + 1.0f));
@@ -2977,12 +2974,10 @@ void run(int argc, char **argv)
         // so only try to connect to each server once.
         sessionOptions.setNumStartAttempts(d_hosts.size() > 1? 1: 1000);
 
-        std::cout << "Connecting to port " << d_port
-                  << " on ";
+        writefln("Connecting to port %s on ", d_port);
         std::copy(d_hosts.begin(),
                   d_hosts.end(),
                   std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << std::endl;
 
         Name PUBLISH_MESSAGE_TYPE(d_messageType.c_str());
 
@@ -2994,7 +2989,7 @@ void run(int argc, char **argv)
         ProviderSession session(sessionOptions, &myEventHandler, 0);
         d_session_p = & session;
         if (!session.start()) {
-            std::cerr << "Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
 
@@ -3008,7 +3003,7 @@ void run(int argc, char **argv)
                         &session, CorrelationId((void *)"auth"));
             }
             if (!isAuthorized) {
-                std::cerr << "No authorization" << std::endl;
+                stderr.writefln( "No authorization");
                 return;
             }
         }
@@ -3017,24 +3012,18 @@ void run(int argc, char **argv)
         serviceOptions.setGroupId(d_groupId.c_str(), d_groupId.size());
         serviceOptions.setServicePriority(d_priority);
         if (d_useSsc) {
-            std::cout << "Adding active sub service code range "
-                      << "[" << d_sscBegin << ", " << d_sscEnd
-                      << "] @ priority " << d_sscPriority << std::endl;
+            writefln("Adding active sub service code range [%s,%s] @ priority %s",d_sscBegin, d_sscEnd, d_sscPriority);
             try {
-                serviceOptions.addActiveSubServiceCodeRange(d_sscBegin,
-                                                            d_sscEnd,
-                                                            d_sscPriority);
+                serviceOptions.addActiveSubServiceCodeRange(d_sscBegin, d_sscEnd, d_sscPriority);
             }
             catch (Exception& e) {
-                std::cerr << "FAILED to add active sub service codes."
-                          << " Exception "
-                          << e.description() << std::endl;
+                stderr.writefln("FAILED to add active sub service codes. Exception %s",e.description());
             }
         }
         if (!session.registerService(d_service.c_str(),
                                      providerIdentity,
                                      serviceOptions)) {
-            std::cerr << "Failed to register " << d_service << std::endl;
+            stderr.writefln("Failed to register %s",d_service);
             return;
         }
 
@@ -3140,9 +3129,9 @@ void run(int argc, char **argv)
 void serverRun(ProviderSession *providerSession)
 {
     ProviderSession& session = *providerSession;
-    std::cout << "Server is starting------" << std::endl;
+    writefln("Server is starting------");
     if (!session.start()) {
-        std::cerr << "Failed to start server session." << std::endl;
+        stderr.writefln("Failed to start server session.");
         return;
     }
 
@@ -3156,13 +3145,13 @@ void serverRun(ProviderSession *providerSession)
                     &session, CorrelationId((void *)"sauth"));
         }
         if (!isAuthorized) {
-            std::cerr << "No authorization" << std::endl;
+            stderr.writefln("No authorization");
             return;
         }
     }
 
     if (!session.registerService(d_service.c_str(), providerIdentity)) {
-        std::cerr <<"Failed to register " << d_service << std::endl;
+        stderr.writefln("Failed to register %s", d_service);
         return;
     }
 }
@@ -3170,9 +3159,9 @@ void serverRun(ProviderSession *providerSession)
 void clientRun(Session *requesterSession)
 {
     Session& session = *requesterSession;
-    std::cout << "Client is starting------" << std::endl;
+    writefln("Client is starting------");
     if (!session.start()) {
-        std::cerr <<"Failed to start client session." << std::endl;
+        stderr.writefln("Failed to start client session.");
         return;
     }
 
@@ -3186,13 +3175,13 @@ void clientRun(Session *requesterSession)
                     &session, CorrelationId((void *)"cauth"));
         }
         if (!isAuthorized) {
-            std::cerr << "No authorization" << std::endl;
+            stderr.writefln("No authorization");
             return;
         }
     }
 
     if (!session.openService(d_service.c_str())) {
-        std::cerr <<"Failed to open " << d_service << std::endl;
+        stderr.writefln("Failed to open %s", d_service);
         return;
     }
 
@@ -3216,7 +3205,7 @@ void clientRun(Session *requesterSession)
 
     {
         MutexGuard guard(&g_mutex);
-        std::cout << "Sending Request: " << request << std::endl;
+        writefln("Sending Request: %s",request);
     }
     EventQueue eventQueue;
     session.sendRequest(request, identity,
@@ -3224,7 +3213,7 @@ void clientRun(Session *requesterSession)
 
     while (true) {
         Event event = eventQueue.nextEvent();
-        std::cout << std::endl << "Client received an event" << std::endl;
+        writefln("Client received an event");
         MessageIterator msgIter(event);
         while (msgIter.next()) {
             Message msg = msgIter.message();
@@ -3233,12 +3222,10 @@ void clientRun(Session *requesterSession)
                 if (msg.hasElement("timestamp")) {
                     double responseTime = msg.getElementAsFloat64(
                                             "timestamp");
-                    std::cout << "Response latency = "
-                              << getTimestamp() - responseTime
-                              << std::endl;
+                    writefln("Response latency = %s",getTimestamp() - responseTime);
                 }
             }
-            msg.print(std::cout) << std::endl;
+            writefln("%s",msg);
         }
         if (event.eventType() == Event::RESPONSE) {
             break;
@@ -3256,15 +3243,14 @@ void clientRun(Session *requesterSession)
         sessionOptions.setServerHost(d_host.c_str());
         sessionOptions.setServerPort(d_port);
 
-        std::cout << "Connecting to " <<  d_host << ":"
-                  << d_port << std::endl;
+        writefln("Connecting to %s:%s", d_host, d_port);
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.";
             return;
         }
         if (!session.openService("//blp/refdata")) {
-            std::cerr <<"Failed to open //blp/refdata" << std::endl;
+            stderr.writefln("Failed to open //blp/refdata");
             return;
         }
 
@@ -3331,7 +3317,7 @@ void clientRun(Session *requesterSession)
             cols.appendValue(rateVector.transition);
         }
 
-        std::cout << "Sending Request: " << request << std::endl;
+        writefln("Sending Request: %s",request)l;
         CorrelationId cid(this);
         session.sendRequest(request, cid);
 
@@ -3366,9 +3352,8 @@ void run(string[]argv)
     sessionOptions.setAutoRestartOnDisconnection(true);
     sessionOptions.setNumStartAttempts(d_hosts.size());
 
-    writefln("Connecting to port %s on %s" << d_port, copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
-    std::cout << std::endl;
-
+    writefln("Connecting to port %s on %s", d_port, copy(d_hosts.begin(), d_hosts.end(), std::ostream_iterator<std::string>(std::cout, " "));
+    
     MyProviderEventHandler providerEventHandler(d_service);
     ProviderSession providerSession(
             sessionOptions, &providerEventHandler, 0);
@@ -3384,9 +3369,8 @@ void run(string[]argv)
     }
 
     // wait for enter key to exit application
-    std::cout << "Press ENTER to quit" << std::endl;
-    char dummy[2];
-    std::cin.getline(dummy, 2);
+    writefln("Press ENTER to quit");
+	wait_key();
     if (d_role == SERVER || d_role == BOTH) {
         providerSession.stop();
     }
@@ -3402,12 +3386,11 @@ void run(int argc, char **argv)
 
     initializeSessionOptions();
 
-    std::cout << ">>> Connecting to " + d_host + ":" << d_port
-              << std::endl;
-
+    writefln(">>> Connecting to %s:%s",d_host,d_port);
+    
     Session session(d_sessionOptions);
     if (!session.start()) {
-        std::cout << ">>> Failed to start session" << std::endl;
+        writefln(">>> Failed to start session");
         return;
     }
 
@@ -3416,33 +3399,22 @@ void run(int argc, char **argv)
         const char* authServiceName = AUTH_SERVICE;
         if (session.openService(authServiceName)) {
             Service authService = session.getService(authServiceName);
-            isAuthorized = authorize(authService,
-                                     &session,
-                                     CorrelationId((void*)("auth")));
+            isAuthorized = authorize(authService, &session, CorrelationId((void*)("auth")));
         }
         if (!isAuthorized) {
-            std::cerr << ">>> No authorization" << std::endl;
+            stderr.writefln(">>> No authorization");
             return;
         }
     }
 
     if (!session.openService(INSTRUMENTS_SERVICE)) {
-        std::cout << ">>> Failed to open " << INSTRUMENTS_SERVICE
-                                           << std::endl;
+        writefln(">>> Failed to open %s",INSTRUMENTS_SERVICE);
         return;
     }
 
     sendRequest(&session);
 
-    try {
-        eventLoop(&session);
-    } catch (Exception &e) {
-        std::cerr << ">>> Exception caught: " << e.description()
-                  << std::endl;
-    } catch (...) {
-        std::cerr << ">>> Unknown exception" << std::endl;
-    }
-
+    eventLoop(&session);
     session.stop();
 }
 
@@ -3799,8 +3771,8 @@ void run(int argc, char **argv)
         MessageIterator msgIter(event);
         while (msgIter.next()) {
             Message msg = msgIter.message();
-            std::cout << msg.messageType();
-            msg.print(std::cout) << std::endl;
+            writefln("%s",msg.messageType());
+            writefln("%s",msg);
         }
         if (event.eventType() == Event::RESPONSE) {
             break;
@@ -3841,8 +3813,7 @@ void run(string[] argv)
     if (0 != getPreviousTradingDate (&tradedOnYear,
         &tradedOnMonth,
         &tradedOnDay) ) {
-            std::cerr << "unable to get previous trading date" << std::endl;
-            return;
+            stderr.writefln("unable to get previous trading date");
     }
 
     Datetime starttime;
@@ -3855,7 +3826,7 @@ void run(string[] argv)
     endtime.setTime(13, 35, 0, 0);
     request.set("endDateTime", endtime);
 
-    std::cout << "Sending Request: " << request << std::endl;
+    writefln("Sending Request: %s", request);
     session.sendRequest(request);
 
     while (true) {
@@ -3915,7 +3886,7 @@ void run(string[] argv)
         MessageIterator msgIter(event);
         while (msgIter.next()) {
             Message msg = msgIter.message();
-            msg.print(std::cout) << std::endl;
+            writefln("%s",msg);
         }
         if (event.eventType() == Event::RESPONSE) {
             break;
@@ -3995,15 +3966,14 @@ void run(string[] argv)
         sessionOptions.setServerHost(d_host.c_str());
         sessionOptions.setServerPort(d_port);
 
-        std::cout << "Connecting to " <<  d_host << ":" << d_port
-                  << std::endl;
+        writefln("Connecting to %s:%s",  d_host, d_port);
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
         if (!session.openService("//blp/mktdata")) {
-            std::cerr <<"Failed to open //blp/mktdata" << std::endl;
+            stderr.writefln("Failed to open //blp/mktdata");
             return;
         }
 
@@ -4012,16 +3982,8 @@ void run(string[] argv)
             // this CUSIP identifies US Treasury Bill 'T 3 5/8 02/15/44 Govt'
 
         SubscriptionList subscriptions;
-        subscriptions.add(
-                security1,
-                "LAST_PRICE,BID,ASK",
-                "",
-                CorrelationId((char *)security1));
-        subscriptions.add(
-                security2,
-                "LAST_PRICE,BID,ASK,BID_YIELD,ASK_YIELD",
-                "",
-                CorrelationId((char *)security2));
+        subscriptions.add(security1, "LAST_PRICE,BID,ASK", "", CorrelationId((char *)security1));
+        subscriptions.add(security2, "LAST_PRICE,BID,ASK,BID_YIELD,ASK_YIELD", "", CorrelationId((char *)security2));
         session.subscribe(subscriptions);
 
         while (true) {
@@ -4032,9 +3994,9 @@ void run(string[] argv)
                 if (event.eventType() == Event::SUBSCRIPTION_STATUS ||
                     event.eventType() == Event::SUBSCRIPTION_DATA) {
                     const char *topic = (char *)msg.correlationId().asPointer();
-                    std::cout << topic << " - ";
+                    writefln("%s - ",topic);
                 }
-                msg.print(std::cout) << std::endl;
+                writefln("%s",msg);
             }
             if (event.eventType() == Event::SUBSCRIPTION_DATA) {
                 if (++d_eventCount >= d_maxEvents) break;
@@ -4058,14 +4020,14 @@ void run(string[] argv)
         sessionOptions.setServerHost(d_host.c_str());
         sessionOptions.setServerPort(d_port);
 
-        std::cout << "Connecting to " <<  d_host << ":" << d_port << std::endl;
+        writefln("Connecting to %s:%s",d_host, d_port);
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
         if (!session.openService("//blp/mktdata")) {
-            std::cerr <<"Failed to open //blp/mktdata" << std::endl;
+            stderr.writefln("Failed to open //blp/mktdata");
             return;
         }
 
@@ -4094,9 +4056,9 @@ void run(string[] argv)
                 if (event.eventType() == Event::SUBSCRIPTION_STATUS ||
                     event.eventType() == Event::SUBSCRIPTION_DATA) {
                     const char *topic = (char *)msg.correlationId().asPointer();
-                    std::cout << topic << " - ";
+                    writefln("%s - ", topic);
                 }
-                msg.print(std::cout) << std::endl;
+                writefln("%s",msg);
             }
             if (event.eventType() == Event::SUBSCRIPTION_DATA) {
                 if (++d_eventCount >= d_maxEvents) break;
@@ -4117,15 +4079,14 @@ void run(int argc, char **argv)
         sessionOptions.setServerHost(d_host.c_str());
         sessionOptions.setServerPort(d_port);
 
-        std::cout << "Connecting to "  <<  d_host  <<  ":"
-            << d_port << std::endl;
+        writefln("Connecting to %s:%s", d_host ,d_port);
         Session session(sessionOptions);
         if (!session.start()) {
-            std::cerr <<"Failed to start session." << std::endl;
+            stderr.writefln("Failed to start session.");
             return;
         }
         if (!session.openService("//blp/mktdata")) {
-            std::cerr <<"Failed to open //blp/mktdata" << std::endl;
+            stderr.writefln("Failed to open //blp/mktdata");
             return;
         }
 
@@ -4159,16 +4120,14 @@ void run(int argc, char **argv)
         if (!createSession()) return;
 
         // wait for enter key to exit application
-        ConsoleOut(&d_context.d_consoleLock)
-            << "\nPress ENTER to quit" << std::endl;
-        char dummy[2];
-        std::cin.getline(dummy,2);
+        writefln("Press ENTER to quit");
+        wait_key();
         {
             MutexGuard guard(&d_context.d_mutex);
             d_context.d_isStopped = true;
         }
         d_session.stop();
-        ConsoleOut(&d_context.d_consoleLock) << "\nExiting..." << std::endl;
+        writefln("\nExiting...");
     }
 };
 
@@ -4208,9 +4167,8 @@ void printFailedEntitlements(std::vector<int> &failedEntitlements,
     int numFailedEntitlements)
 {
     for (int i = 0; i < numFailedEntitlements; ++i) {
-        std::cout << failedEntitlements[i] << " ";
+        writefln("%s", failedEntitlements[i]);
     }
-    std::cout << std::endl;
 }
 
 void distributeMessage(Message &msg)
@@ -4221,9 +4179,9 @@ void distributeMessage(Message &msg)
     Element securities = msg.getElement(SECURITY_DATA);
     int numSecurities = securities.numValues();
 
-    std::cout << "Processing " << numSecurities << " securities:"
-        << std::endl;
-    for (int i = 0; i < numSecurities; ++i) {
+    writefln("Processing %s securities", numSecurities);
+    foreach( i;0.. numSecurities)
+    {
         Element security     = securities.getValueAsElement(i);
         std::string ticker   = security.getElementAsString(SECURITY);
         Element entitlements;
@@ -4241,32 +4199,24 @@ void distributeMessage(Message &msg)
                 int numFailures = failedEntitlements.size();
                 if (d_identities[j].hasEntitlements(service, entitlements,
                     &failedEntitlements[0], &numFailures)) {
-                        std::cout << "User: " << d_uuids[j] <<
-                            " is entitled to get data for: " << ticker
-                            << std::endl;
+                        writefln("User: %s is entitled to get data for: %s", d_uuids[j],ticker);
                         // Now Distribute message to the user.
                 }
                 else {
-                    std::cout << "User: " << d_uuids[j] <<
-                        " is NOT entitled to get data for: "
-                        << ticker << " - Failed eids: " << std::endl;
-                    printFailedEntitlements(failedEntitlements,
-                                            numFailures);
+                    writefln("User: %s is NOT entitled to get data for: %s - Failed eids:", d_uuids[j], ticker);
+                    printFailedEntitlements(failedEntitlements, numFailures);
                 }
             }
         }
         else {
             // No Entitlements are required to access this data.
-            for (int j = 0; j < numUsers; ++j) {
-                std::cout <<"User: " << d_uuids[j] <<
-                    " is entitled to get data for: "
-                    << ticker << std::endl;
+            foreach(j;0.. numUsers; ++j) {
+                writefln("User: %s is entitled to get data for: %s", d_uuids[j]. ticker);
                 // Now Distribute message to the user.
             }
         }
     }
 }
-
 
 
 // need to fix this to work with ipaddress and token not just uuid
@@ -4392,19 +4342,15 @@ bool authorizeUsers(EventQueue *authQueue, Session *session)
                     Message msg = msgIter.message();
 
                     if (msg.messageType() == AUTHORIZATION_SUCCESS) {
-                        std::cout << d_uuids[msg.correlationId().asInteger()]
-                            << " authorization success"
-                            << std::endl;
+                        writefln("%s authorization success",d_uuids[msg.correlationId().asInteger()]);
                         is_any_user_authorized = true;
                     }
                     else if (msg.messageType() == AUTHORIZATION_FAILURE) {
-                        std::cout << d_uuids[msg.correlationId().asInteger()]
-                            << " authorization failed"
-                            << std::endl;
-                        std::cout << msg << std::endl;
+                        writefln("%s authorization failed",d_uuids[msg.correlationId().asInteger()]);
+                        writefln("%s",msg);
                     }
                     else {
-                        std::cout << msg << std::endl;
+                        writefln("%s",msg);
                     }
                 }
             }
@@ -4566,7 +4512,7 @@ void processSubscriptionDataEvent(const Event &event)
         if (!msg.hasElement(d_fieldName)) {
             continue;
         }
-        std::cout << "\t" << topic << std::endl;
+        writefln("\t%s", topic);
         Element field = msg.getElement(d_fieldName);
         if (!field.isValid()) {
             continue;
@@ -4578,55 +4524,20 @@ void processSubscriptionDataEvent(const Event &event)
                 handle.hasEntitlements(service,
                     msg.getElement(EID), 0, 0))
             {
-                    std::cout << "User #" << (i+1) << " is entitled"
-                        << " for " << field << std::endl;
+                    writefln("User #%s is entitled for %s",to!string((i+1)), field);
             }
             else {
-                std::cout << "User #" << (i+1) << " is NOT entitled"
-                    << " for " << d_fieldName << std::endl;
+                writefln("User #%s is NOT entitled for %s", to!string(i+1), d_fieldName);
             }
         }
     }
 }
 
 
-//
-// This program demonstrates a server mode application that authorizes its
-// users with tokens returned by a generateToken request. For the purposes
-// of this demonstration, the "GetAuthorizationToken" program can be used
-// to generate a token and display it on the console. For ease of demonstration
-// this application takes one or more 'tokens' on the command line. But in a real
-// server mode application the 'token' would be received from the client
-// applications using some IPC mechanism.
-//
-// Workflow:
-// * connect to server
-// * open services
-// * send authorization request for each 'token' which represents a user.
-// * send "ReferenceDataRequest" for all specified 'securities'
-// * for each response message, check which users are entitled to receive
-//   that message before distributing that message to the user.
-//
-// Command line arguments:
-// -ip <serverHostNameOrIp>
-// -p  <serverPort>
-// -t  <token>
-// -s  <security>
-// Multiple securities and tokens can be specified.
-//
-
-
-} // anonymous namespace
-
-
-
-void printFailedEntitlements(std::vector<int> &failedEntitlements,
-    int numFailedEntitlements)
+void printFailedEntitlements(int[] failedEntitlements, int numFailedEntitlements)
 {
-    for (int i = 0; i < numFailedEntitlements; ++i) {
-        std::cout << failedEntitlements[i] << " ";
-    }
-    std::cout << std::endl;
+    foreach(i;0.. numFailedEntitlements)
+        writefln("%s",failedEntitlements[i]);
 }
 
 void distributeMessage(Message &msg)
@@ -4667,41 +4578,24 @@ void distributeMessage(Message &msg)
         }
         else {
             // No Entitlements are required to access this data.
-            for (int j = 0; j < numUsers; ++j) {
-                std::cout << "User: " << d_tokens[j] <<
-                    " is entitled to get data for: "
-                    << ticker << std::endl;
-                // Now Distribute message to the user.
+            foreach(j;0.. numUsers) []
+                writefln("User: %s is entitled to get data for: %s",d_tokens[j],ticker);
             }
         }
     }
 }
 
 
-
-
-
-
-
-
-public:
-
-EntitlementsVerificationTokenExample()
-: d_host("localhost")
-, d_port(8194)
-{
-}
-
-
 void sendRequest()
 {
-    Service refDataService = d_session.getService("//blp/refdata");
-    Request request = refDataService.createRequest("ReferenceDataRequest");
+	auto refDataService = d_session.getService("//blp/refdata");
+    auto request = refDataService.createRequest("ReferenceDataRequest");
 
     // Add securities to request
     Element securities = request.getElement("securities");
-    for (size_t i = 0; i < d_securities.size(); ++i) {
+    foreach(i;0.. d_securities.size()) {
         securities.appendValue(d_securities[i].c_str());
+    
     }
 
     // Add fields to request
@@ -4710,13 +4604,13 @@ void sendRequest()
         fields.appendValue(d_fields[i].c_str());
     }
 
-    std::cout << "Sending Request: " << request << std::endl;
-    d_session.sendRequest(request, d_identity);
+    writefln("Sending Request: %s", request);
+     _session.sendRequest(request, d_identity);
 }
 
 bool processTokenStatus(const Event &event)
 {
-    std::cout << "processTokenEvents" << std::endl;
+    writefln("processTokenEvents");
     MessageIterator msgIter(event);
     while (msgIter.next()) {
         Message msg = msgIter.message();
@@ -4740,13 +4634,6 @@ bool processTokenStatus(const Event &event)
 }
 
 
-
-public:
-GenerateTokenExample()
-    : d_host("localhost"), d_port(8194), d_useDS(false), d_session(0)
-{
-}
-
 ~GenerateTokenExample()
 {
     if (d_session) {
@@ -4754,10 +4641,6 @@ GenerateTokenExample()
         delete d_session;
     }
 }
-
-
-
-
 
 
 void subscribe()
@@ -4769,7 +4652,7 @@ void subscribe()
         subscriptions.add(d_securities[i].c_str(), d_fields, d_options, CorrelationId(i + 100));
     }
 
-    std::cout << "Subscribing..." << std::endl;
+    writefln("Subscribing...");
     d_session.subscribe(subscriptions, d_identity);
 }
 
@@ -4803,16 +4686,15 @@ bool processTokenStatus(const Event &event)
 
     void printErrorInfo(const char *leadingStr, const Element &errorInfo)
     {
-        writefln(leadingStr ~ errorInfo.getElementAsString(CATEGORY)~ " (" << errorInfo.getElementAsString(MESSAGE) ~ ")");
+        writefln("%s %s  (%s)",leadingStr,errorInfo.getElementAsString(CATEGORY),errorInfo.getElementAsString(MESSAGE));
     }
 
     
     void processMessage(Message &msg) {
         Element data = msg.getElement(BAR_DATA).getElement(BAR_TICK_DATA);
-        int numBars = data.numValues();
-        std::cout <<"Response contains " << numBars << " bars" << std::endl;
-        std::cout <<"Datetime\t\tOpen\t\tHigh\t\tLow\t\tClose" <<
-            "\t\tNumEvents\tVolume" << std::endl;
+        auto numBars = data.numValues();
+        writefln("Response contains %s bars", numBars);
+        writefln("Datetime\t\tOpen\t\tHigh\t\tLow\t\tClose\t\tNumEvents\tVolume");
         foreach(i;0 .. numBars)
         {
             Element bar = data.getValueAsElement(i);
@@ -4861,7 +4743,7 @@ bool processTokenStatus(const Event &event)
             request.set("gapFillInitialBar", d_gapFillInitialBar);
         }
 
-        std::cout <<"Sending Request: " << request << std::endl;
+        writefln("Sending Request: %s",request);
         session.sendRequest(request);
     }
 
@@ -4934,11 +4816,7 @@ bool processTokenStatus(const Event &event)
 
 void printErrorInfo(const char *leadingStr, const Element &errorInfo)
 {
-    std::cout
-        << leadingStr
-        << errorInfo.getElementAsString(CATEGORY)
-        << " (" << errorInfo.getElementAsString(MESSAGE)
-        << ")" << std::endl;
+    writefln("%s %s (%s)",leadingStr,errorInfo.getElementAsString(CATEGORY), errorInfo.getElementAsString(MESSAGE));
 }
 
 
@@ -4946,11 +4824,12 @@ void processMessage(Message &msg)
 {
     Element data = msg.getElement(TICK_DATA).getElement(TICK_DATA);
     int numItems = data.numValues();
-    std::cout << "TIME\t\t\t\tTYPE\tVALUE\t\tSIZE\tCC" << std::endl;
-    std::cout << "----\t\t\t\t----\t-----\t\t----\t--" << std::endl;
+    writefln("TIME\t\t\t\tTYPE\tVALUE\t\tSIZE\tCC");
+    writefln("----\t\t\t\t----\t-----\t\t----\t--");
     std::string cc;
     std::string type;
-    for (int i = 0; i < numItems; ++i) {
+    foreach(i;0.. numItems)
+    {
         Element item = data.getValueAsElement(i);
         std::string timeString = item.getElementAsString(TIME);
         type = item.getElementAsString(TYPE);
@@ -4962,14 +4841,8 @@ void processMessage(Message &msg)
             cc.clear();
         }
 
-        std::cout.setf(std::ios::fixed, std::ios::floatfield);
-        std::cout << timeString <<  "\t"
-            << type << "\t"
-            << std::setprecision(3)
-            << std::showpoint << value << "\t\t"
-            << size << "\t" << std::noshowpoint
-            << cc << std::endl;
-    }
+        writefln("%s\t%s\t%s\t%s\t%s",timeString,type,value,size,cc); // we can make it pretty later
+	}
 }
 
 
@@ -5006,7 +4879,7 @@ void sendIntradayTickRequest(Session &session)
         request.set("includeConditionCodes", true);
     }
 
-    std::cout <<"Sending Request: " << request << std::endl;
+    writefln("Sending Request: %s", request);
     session.sendRequest(request);
 }
 
@@ -5016,11 +4889,11 @@ void eventLoop(Session &session)
     while (!done) {
         Event event = session.nextEvent();
         if (event.eventType() == Event::PARTIAL_RESPONSE) {
-            std::cout <<"Processing Partial Response" << std::endl;
+            writefln("Processing Partial Response");
             processResponseEvent(event);
         }
         else if (event.eventType() == Event::RESPONSE) {
-            std::cout <<"Processing Response" << std::endl;
+            writefln("Processing Response");
             processResponseEvent(event);
             done = true;
         } else {
@@ -5096,7 +4969,7 @@ int getTradingDateRange (Datetime *startDate_p, Datetime *endDate_p)
             }
         }
         if (token.length() == 0) {
-            std::cout << "Failed to get token" << std::endl;
+            writefln("Failed to get token");
             return false;
         }
 
@@ -5121,7 +4994,7 @@ int getTradingDateRange (Datetime *startDate_p, Datetime *endDate_p)
                         return true;
                     }
                     else {
-                        std::cout << "Authorization failed" << std::endl;
+                        writefln("Authorization failed");
                         return false;
                     }
                 }
@@ -5177,7 +5050,7 @@ GenerateTokenSubscriptionExample()
             }
         }
         if (token.length() == 0) {
-            std::cout << "Failed to get token" << std::endl;
+            writefln("Failed to get token");
             return false;
         }
 
@@ -5202,7 +5075,7 @@ GenerateTokenSubscriptionExample()
                         return true;
                     }
                     else {
-                        std::cout << "Authorization failed" << std::endl;
+                        writefln("Authorization failed");
                         return false;
                     }
                 }
@@ -5250,7 +5123,7 @@ public:
         }
         if (token.length() == 0) {
             MutexGuard guard(&g_lock);
-            std::cout << "Failed to get token" << std::endl;
+            writefln("Failed to get token");
             return false;
         }
 
@@ -5294,7 +5167,7 @@ public:
         for (int i = 0; i < d_fields.size(); ++i) {
             if (!elementDef.typeDefinition().hasElementDefinition(
                     d_fields[i])) {
-                std::cerr << "Invalid field " << d_fields[i] << std::endl;
+                stderr.writefln("Invalid field %s",d_fields[i]);
                 continue;
             }
             SchemaElementDefinition fieldDef =
@@ -5849,7 +5722,7 @@ bool authorize(const Service &authService,
         }
     }
     if (token.length() == 0) {
-        std::cout << ">>> Failed to get token" << std::endl;
+        writefln(">>> Failed to get token");
         return false;
     }
 
@@ -5875,7 +5748,7 @@ bool authorize(const Service &authService,
                     return true;
                 }
                 else {
-                    std::cout << ">>> Authorization failed" << std::endl;
+                    writefln(">>> Authorization failed");
                     return false;
                 }
             }
@@ -5892,20 +5765,15 @@ void dumpInstrumentResults(const std::string& msgPrefix,
 {
     const Element& response = msg.asElement();
     const Element& results  = response.getElement(RESULTS_ELEMENT);
-    std::cout << ">>> Received " << results.numValues()
-              << " elements" << std::endl;
-
+    writefln(">>> Received %s elements", results.numValues());
+    
     size_t numElements = results.numValues();
 
-    std::cout << msgPrefix << ' ' << numElements << " results:"
-              << std::endl;
-    for (size_t i = 0; i < numElements; ++i) {
+    writefln("%s %s results:",msgPrefix, numElements);
+    foreach(i;0.. numElements)
+    {
         Element result = results.getValueAsElement(i);
-        std::cout << std::setw(2) << (i + 1) << ": " << std::setw(30)
-                  << result.getElementAsString(SECURITY_ELEMENT)
-                  << " - "
-                  << result.getElementAsString(DESCRIPTION_ELEMENT)
-                  << std::endl;
+        writefln("%s:%s - %s", (i + 1),result.getElementAsString(SECURITY_ELEMENT),result.getElementAsString(DESCRIPTION_ELEMENT));
     }
 }
 
@@ -6152,10 +6020,7 @@ int getPreviousTradingDate (int *year_p, int *month_p, int *day_p)
 
             std::string topic = getTopic(cid);
             {
-                ConsoleOut out(d_consoleLock_p);
-                out << timeBuffer << ": " << topic
-                    << std::endl;
-                msg.print(out.stream(), 0, 4);
+                writefln("%s:%s",timeBuffer, topic);
             }
 
             if (msg.messageType() == SUBSCRIPTION_TERMINATED
@@ -6166,9 +6031,7 @@ int getPreviousTradingDate (int *year_p, int *month_p, int *day_p)
                     cid);
                 assert(topicString);
                 if (d_isSlow) {
-                    ConsoleOut(d_consoleLock_p)
-                        << "Deferring subscription for topic = " << topic
-                        << " because session is slow." << std::endl;
+                    writefln("Deferring subscription for topic = %s because session is slow",topic);
                     d_pendingSubscriptions.add(topicString, cid);
                 }
                 else {
@@ -6189,16 +6052,12 @@ int getPreviousTradingDate (int *year_p, int *month_p, int *day_p)
         char timeBuffer[64];
         getTimeStamp(timeBuffer, sizeof(timeBuffer));
 
-        ConsoleOut(d_consoleLock_p)
-            << "\nProcessing SUBSCRIPTION_DATA" << std::endl;
+        writefln("Processing SUBSCRIPTION_DATA");
         MessageIterator msgIter(event);
         while (msgIter.next()) {
             Message msg = msgIter.message();
             {
-                ConsoleOut out(d_consoleLock_p);
-                out << timeBuffer << ": " << getTopic(msg.correlationId())
-                    << std::endl;
-                msg.print(out.stream(), 0, 4);
+                writefln("%s:%s %s",timeBuffer,getTopic(msg.correlationId()),msg);
             }
         }
         return true;
@@ -6209,9 +6068,8 @@ int getPreviousTradingDate (int *year_p, int *month_p, int *day_p)
         char timeBuffer[64];
         getTimeStamp(timeBuffer, sizeof(timeBuffer));
 
-        ConsoleOut(d_consoleLock_p)
-            << "\nProcessing ADMIN" << std::endl;
-        std::vector<CorrelationId> cidsToCancel;
+        writefln("Processing ADMIN");
+        CorrelationId[] cidsToCancel;
         bool previouslySlow = d_isSlow;
         MessageIterator msgIter(event);
 
@@ -6300,30 +6158,25 @@ int getPreviousTradingDate (int *year_p, int *month_p, int *day_p)
 
     bool createSession()
     {
-        ConsoleOut(&d_context.d_consoleLock)
-            << "Connecting to " << d_sessionOptions.serverHost()
-            << ":" << d_sessionOptions.serverPort() << std::endl;
+        writefln("Connecting to ^s:%s",d_sessionOptions.serverHost(), d_sessionOptions.serverPort());
 
         d_eventHandler = new SubscriptionEventHandler(&d_context);
         d_session = new Session(d_sessionOptions, d_eventHandler);
 
         if (!d_session.start()) {
-            ConsoleOut(&d_context.d_consoleLock)
-                << "Failed to start session." << std::endl;
+            writefln("Failed to start session.");
             return false;
         }
 
-        ConsoleOut(&d_context.d_consoleLock)
-            << "Connected successfully" << std::endl;
+        writefln("Connected successfully");
 
         if (!d_session.openService(d_service.c_str())) {
-            ConsoleOut(&d_context.d_consoleLock)
-                << "Failed to open mktdata service" << std::endl;
+            writefln("Failed to open mktdata service");
             d_session.stop();
             return false;
         }
 
-        ConsoleOut(&d_context.d_consoleLock) << "Subscribing..." << std::endl;
+        writefln("Subscribing...");
         d_session.subscribe(d_context.d_subscriptions);
         return true;
     }
@@ -6368,7 +6221,7 @@ bool authorize(const Service &authService, Identity *providerIdentity, AbstractS
         }
     }
     if (token.length() == 0) {
-        std::cout << "Failed to get token" << std::endl;
+        writefln("Failed to get token");
         return false;
     }
 

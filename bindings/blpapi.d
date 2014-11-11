@@ -191,8 +191,11 @@ struct xbitmap {
     }
   }
 
+  // note we should just get rid of separate bitmap struct type and collapse logic into this struct below
+  // or even better fix the existing D mixin implementation
+
   struct blpapi_CorrelationId_t_ {
-    uint x;                           //bit fields cause problems with linkage
+    uint x;                           //bit fields cause problems with linkage for me on Windows with .lib
       
     union _value {
         blpapi_UInt64_t      intValue;

@@ -10,7 +10,7 @@ void memset(void* ptr, ubyte val, long nbytes)
 		*cast(ubyte*)(cast(ubyte)ptr+i)=val;
 }
 
-extern (C)
+extern(System)
 {
 	static int streamWriter(const char* data, int length, void *stream)
 	{
@@ -32,7 +32,7 @@ extern (C)
 			blpapi_Element_t* messageElements = cast(blpapi_Element_t*)0;
 			assert(message);
 			correlationId = blpapi_Message_correlationId(message, 0);
-			writefln("correlationId=%d %d %lld", correlationId.valueType, correlationId.classId, correlationId.value.intValue);
+			writefln("correlationId=%d %d %lld", correlationId.xx.valueType, correlationId.classId, correlationId.value.intValue);
 			writefln("messageType =%s", blpapi_Message_typeString(message));
 			messageElements = blpapi_Message_elements(message);
 			assert(messageElements);
