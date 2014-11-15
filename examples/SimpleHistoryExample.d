@@ -18,10 +18,12 @@
  * IN THE SOFTWARE.
  */
 import std.container;
+import std.conv;
 import std.string;
 import std.stdio;
 import std.stdlib;
 import blpapi;
+import blputils;
 
 string d_host;
 int d_port;
@@ -38,12 +40,12 @@ bool parseCommandLine(string[] argv)
 {
     foreach(i;1..argv.length)
     {
-        if ((!argv[i]=="-ip") && (i + 1 < argv.length)) {
+        if ((argv[i]=="-ip") && (i + 1 < argv.length)) {
             d_host = argv[++i];
             continue;
         }
-        if ((!argv[i]=="-p") &&  (i + 1 < argv.length)) {
-            d_port = std::atoi(argv[++i]);
+        if ((argv[i]=="-p") &&  (i + 1 < argv.length)) {
+            d_port = to!integer(argv[++i]);
             continue;
         }
         printUsage();
@@ -56,7 +58,7 @@ void run(string[] argv)
 {
     d_host = "localhost";
     d_port = 8194;
-    if (!parseCommandLine(argc, argv)) return;
+    if (!parseCommandLine(argv)) return;
 
     SessionOptions sessionOptions;
     sessionOptions.setServerHost(d_host.c_str());
@@ -103,15 +105,9 @@ void run(string[] argv)
 int main(string[] argv)
 {
     writefln("SimpleHistoryExample");
-    SimpleHistoryExample example;
-    try {
-        example.run(argc, argv);
-    } catch (Exception &e) {
-        stderr.writefln("Library Exception!!! %s",e.description());
-    }
+    run(argv);
     // wait for enter key to exit application
     writefln("Press ENTER to quit");
-    char dummy[2];
-    std::cin.getline(dummy, 2);
+    wait_key();
     return 0;
 }

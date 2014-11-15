@@ -26,11 +26,6 @@ import std.conv;
 import std.algorithm;
 import blp_api;
 
-import std.stdio;
-import std.string;
-import std.conv;
-import blpapi;
-
 void memset(void* ptr, ubyte val, long nbytes)
 {
     foreach(i;0..nbytes)
@@ -421,3 +416,4 @@ int main(string[] argv)
     return 0;
     
 }
+

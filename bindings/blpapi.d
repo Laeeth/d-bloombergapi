@@ -371,6 +371,9 @@ struct xbitmap {
    ERROR_DS_PROPERTY_NOT_FOUND =(BLPAPI.NOTFOUND_CLASS | 20) ,
   }
 
+
+  int blpapi_Identity_isAuthorized(const blpapi_Identity_t* handle, const blpapi_Service_t *service);
+  int blpapi_Identity_getSeatType(const blpapi_Identity_t* handle, int *seatType);
   void blpapi_UserHandle_release(blpapi_UserHandle_t *handle);
   int blpapi_UserHandle_addRef(blpapi_UserHandle_t *handle);
   int blpapi_UserHandle_hasEntitlements(const blpapi_UserHandle_t* handle, const blpapi_Service_t* service, const blpapi_Element_t* eidElement,const int* entitlementIds, size_t numEntitlements, int* failedEntitlements, int* failedEntitlementsCount);
@@ -878,8 +881,8 @@ struct xbitmap {
   struct blpapi_SessionOptions;
   alias blpapi_SessionOptions_t = blpapi_SessionOptions ;
 
-  struct blpapi_SubscriptionItrerator;
-  alias blpapi_SubscriptionIterator_t = blpapi_SubscriptionItrerator ;
+  struct blpapi_SubscriptionIterator;
+  alias blpapi_SubscriptionIterator_t = blpapi_SubscriptionIterator ;
 
   struct blpapi_Identity;
   alias blpapi_UserHandle=blpapi_Identity;
@@ -895,10 +898,7 @@ struct xbitmap {
    return((MAJOR) * 65536 + (MINOR) * 256 + (PATCH));
   }
    
-  long BLPAPI_SDK_VERSION()
-  {
-      return BLPAPI_MAKE_VERSION(BLPAPI.VERSION_MAJOR, BLPAPI.VERSION_MINOR, BLPAPI.VERSION_PATCH);
-  }
+  enum BLPAPI_SDK_VERSION=BLPAPI_MAKE_VERSION(BLPAPI.VERSION_MAJOR, BLPAPI.VERSION_MINOR, BLPAPI.VERSION_PATCH);
   
   alias blpapi_EventHandler_t= void function(blpapi_Event_t* event, blpapi_Session_t* session, void *userData);
 }
@@ -935,4 +935,9 @@ struct xbitmap {
   void blpapi_Request_destroy(blpapi_Request_t *request);
   blpapi_Element_t* blpapi_Request_elements(blpapi_Request_t *request);
   void blpapi_Request_setPreferredRoute(blpapi_Request_t *request, blpapi_CorrelationId_t *correlationId);
+  blpapi_EventDispatcher_t* blpapi_EventDispatcher_create(size_t numDispatcherThreads);
+  void blpapi_EventDispatcher_destroy(blpapi_EventDispatcher_t *handle);
+  int blpapi_EventDispatcher_start(blpapi_EventDispatcher_t *handle);
+  int blpapi_EventDispatcher_stop(blpapi_EventDispatcher_t *handle, int async);
+  int blpapi_EventDispatcher_dispatchEvents(blpapi_EventDispatcher_t *handle);
 } // extern (Windows)
