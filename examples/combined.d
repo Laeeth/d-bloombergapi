@@ -614,7 +614,7 @@ bool processEvent(const Event &event)
     }
     return true;
 }
-bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
+bool processEvent(const Event* event, ProviderSession* session)
 {
     if (event.eventType() == Event::SESSION_STATUS) {
         printMessages(event);
@@ -829,7 +829,7 @@ bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
 
     return true;
 }
-bool MyEventHandler::processEvent(const Event& event, ProviderSession* session)
+bool processEvent(const Event* event, ProviderSession* session)
 {
     if (event.eventType() == Event::SESSION_STATUS) {
         printMessages(event);
@@ -5235,11 +5235,11 @@ public:
         }
     }
 
-    const std::string& getId() { return d_id; }
+    string getId() { return d_id; }
 
     void next() { d_lastValue += 1; }
 
-    Topic& topic() {
+    Topic* topic() {
         return d_topic;
     }
 
@@ -5247,9 +5247,9 @@ public:
         return d_topic.isValid() && d_isSubscribed;
     }
 
-};
+}
 
-void printMessages(const Event& event)
+void printMessages(const Event* event)
 {
     MessageIterator iter(event);
     while (iter.next()) {
@@ -5262,13 +5262,10 @@ void printMessages(const Event& event)
 
     void activate() {
         if (d_useSsc) {
-            std::cout << "Activating sub service code range "
-                      << "[" << d_sscBegin << ", " << d_sscEnd
-                      << "] @ priority " << d_sscPriority << std::endl;
-            d_session_p.activateSubServiceCodeRange(d_service.c_str(),
-                                                     d_sscBegin,
-                                                     d_sscEnd,
-                                                     d_sscPriority);
+            writefln("Activating sub service code range "
+                       "[" ~ d_sscBegin ~ ", " ~ d_sscEnd
+                      ~ "] @ priority " ~  d_sscPriority ~ std::endl;
+            d_session_p.activateSubServiceCodeRange(d_service.c_str(), d_sscBegin, d_sscEnd, d_sscPriority);
         }
     }
     void deactivate() {
@@ -5698,9 +5695,7 @@ void initializeSessionOptions()
     d_sessionOptions.setAuthenticationOptions(d_authOptions.c_str());
 }
 
-bool authorize(const Service &authService,
-              Session *session,
-              const CorrelationId &cid)
+bool authorize(const Service &authService, Session *session, const CorrelationId* cid)
 {
     EventQueue tokenEventQueue;
     session.generateToken(cid, &tokenEventQueue);

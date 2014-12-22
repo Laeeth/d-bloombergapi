@@ -1,0 +1,9 @@
+{
+	"name": "d-bloombergapi",
+	"description": "Bloomberg API for the D Programming Language.",
+	"authors": ["Bloomberg","Laeeth Isharc"],
+	"homepage": "https://github.com/Laeeth/d-bloombergapi",
+	"license": "Boost-1.0",
+	"dependencies": {
+	}
+}
